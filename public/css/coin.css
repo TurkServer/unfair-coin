@@ -1,0 +1,15 @@
+.heads{
+  width:120px;
+  height: 120px;
+  background-image: url("../img/coin-head.png");
+  background-size: 120px 120px;
+  background-repeat: no-repeat;
+}
+
+.tails{
+  width:120px;
+  height: 120px;
+  background-image: url("../img/coin-tail.jpg");
+  background-size: 120px 120px;
+  background-repeat: no-repeat;
+}

@@ -1,0 +1,64 @@
+<template name="home">
+
+  <head>
+    <title>Unfair Coin Game</title>
+  </head>
+  Please accept the HIT to continue. {{> info}}
+  <a href="/experiment">Start</a>
+</template>
+
+
+<template name="experiment">
+
+  <head>
+    <title>Unfair Coin</title>
+    <link href='css/coin.css' rel="stylesheet">
+    <script type="text/javascript" src="js/coin.js"></script>
+  </head>
+
+  <body>
+    <h1>Welcome to Unfair Coin Game!</h1>
+    <h2>Public flip:</h2>
+    <p>Result: {{#each games}} {{publicData}} {{/each}}
+    </p>
+
+    <h2>Players:</h2> {{> userTable}}
+
+    <hr/>
+    <h2>Private flip:</h2>
+    <p>You've flip the coin {{counter}} times.</p>
+    <p>Result for {{currentUser.username}}: {{currentUser.game.privateData}}
+    </p>
+    <button>Flip</button>
+    <div id="coin"></div>
+    <hr/>
+    
+    {{> guessForm}}
+  </body>
+</template>
+
+
+<template name="info">
+  <h2>Learn Rules about how to play?</h2>
+</template>
+
+<template name="userTable">
+  <div class="col-md-12">
+    <div class="alert alert-info">
+      {{#each userList}}
+      <span class="badge">{{username}}</span> 
+      {{/each}}
+    </div>
+  </div>
+</template>
+
+<template name="guessForm">
+  <form id="guess" name="guessForm" class="guess">
+      Guess possibility:
+      <br/>
+      <input type="range" min="0" max="100" value="0" step="1" onchange="showValue(this.value)" />
+      <span id="range">0</span>
+      <br/>
+      <input type="submit" id="submit"/>
+  </form>
+</template>
