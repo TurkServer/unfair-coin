@@ -38,17 +38,28 @@ Template.experiment.events({
 });
 
 Template.guessForm.events({
-  'change input[type=range]': function(event){
-     var sliderValue = event.currentTarget.value;
+  'change input[type=range]': function(e){
+     var sliderValue = e.currentTarget.value;
      Session.set('guessSliderValue', sliderValue/100);
      //then you can get this session and return it in a helper to display on your page
   },
-   'submit #guess'(event) {   //#guess .guess
+   'submit #guess'(e) {   //#guess .guess
       console.log('Submitting user guess from form! - ', event); //Retrive value from Event obj
-      console.log('value =', Session.get('guessSliderValue')); //Meteor way: To persist it.
+      console.log('value from session =', Session.get('guessSliderValue')); //Meteor way: To persist it.
+      console.log('value from e =', e.target.slider.value/100); //REST way: to persist it.
       event.preventDefault();
       event.stopPropagation();
       return false; 
+   }
+ });
+ 
+ Template.survey.events({
+   'submit .survey': function (e) {
+     e.preventDefault();
+     var results = {
+       confusing: e.target.confusing.value,
+       feedback: e.target.feedback.value};
+       TurkServer.submitExitSurvey(results);
    }
  });
     

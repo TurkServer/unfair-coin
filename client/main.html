@@ -9,7 +9,7 @@
 
 
 <template name="experiment">
-
+  
   <head>
     <title>Unfair Coin</title>
     <link href='css/coin.css' rel="stylesheet">
@@ -56,9 +56,19 @@
   <form id="guess" name="guessForm" class="guess">
       Guess possibility:
       <br/>
-      <input type="range" min="0" max="100" value="0" step="1" onchange="showValue(this.value)" />
+      <input name="slider" type="range" min="0" max="100" value="0" step="1" onchange="showValue(this.value)" />
       <span id="range">0</span>
       <br/>
       <input type="submit" id="submit"/>
+  </form>
+</template>
+
+<template name="survey">
+  <form class="survey">
+    <p>Was there anything confusing about this HIT?</p>
+    <textarea name="confusing" rows="3"></textarea><br/>
+    <p>Do you have any feedback for us?</p>
+    <textarea name="feedback" rows="3"></textarea><br/>
+    <button type="submit">Submit the HIT</button>
   </form>
 </template>
