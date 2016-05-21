@@ -11,6 +11,10 @@ Template.experiment.onCreated(function bodyOnCreated() {
   MongoGames = new Mongo.Collection('games'); 
 
   Meteor.subscribe("Users");
+  
+  Meteor.subscribe("Players");
+  MongoPlayers = new Mongo.Collection('players');
+  
 });
 
 Template.experiment.helpers({
@@ -19,6 +23,17 @@ Template.experiment.helpers({
   },
   games: function() {
     return MongoGames.find({}, { sort: { createdAt: -1 } });
+  },
+  players: function(uid) {
+    return MongoPlayers.find({uid: uid}, { sort: { createdAt: -1 } });
+  }
+})
+
+Template.experiment.events({
+  'click button'(event, instance) {
+    // increment the counter when button is clicked
+    instance.counter.set(instance.counter.get() + 1);
+    //Meteor.call("flip");
   }
 });
 
@@ -26,14 +41,9 @@ Template.userTable.helpers({
   userList: function() {
     //Tracker.nonreactive(function() { console.log(Meteor.users.find().fetch()); });
     return Meteor.users.find({}, { fields: { username: 1 } });
-  }
-});
-
-Template.experiment.events({
-  'click button'(event, instance) {
-    // increment the counter when button is clicked
-    instance.counter.set(instance.counter.get() + 1);
-    //Meteor.call("flip");
+  },
+  playerList: function() {
+    return MongoPlayers.find({}, { sort: { createdAt: -1 } });
   }
 });
 

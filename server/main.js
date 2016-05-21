@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 Meteor.startup(() => {
   // code to run on server at startup
   Games = new Mongo.Collection('games');
+  Players = new Mongo.Collection('players');
   
   //Generate data from server side.
   // n game with x random coins flip in public ,  y random coins flip in private with z (Hits) users.
@@ -12,7 +13,7 @@ Meteor.startup(() => {
   let p = 0.50; //fair
   
   var userList = Meteor.users.find().fetch();
-  var gid = Meteor.call('makeid');
+  var gid =  Random.id(); // Meteor way, or custom: Meteor.call('makeid');
 
   Meteor.call('Generator', gid, x, y, p, userList);
 
@@ -22,6 +23,10 @@ Meteor.startup(() => {
 
   Meteor.publish("Users", function() {
     return Meteor.users.find();
+  });
+  
+  Meteor.publish("Players", function() {
+    return Players.find({ gid: gid });
   });
   
 });
@@ -36,35 +41,38 @@ Meteor.methods({
         privateDataList.push(privateData);
       }
       Games.insert({
-            gid: gid,
-            createdAt: new Date(),
-            publicData: publicData,
-            privateDataList: privateDataList,
-            answer: p
+          gid: gid,
+          createdAt: new Date(),
+          publicData: publicData,
+          privateDataList: privateDataList,
+          answer: p
       });
      
      Meteor.call('AssignUsers', gid, userList, privateDataList);
     },
     AssignUsers: function (gid, userList, privateDataList) {
       userList.forEach(function(item, index){
-        Meteor.users.update({'_id':item._id}, 
-        {$set: { 
-          game:{
-            gid: gid,
-            privateData: privateDataList[index],
+        Players.upsert(
+        {'uid': item._id, 'gid':gid},
+        {
+          $set: {
+            createdAt: new Date(),     
+            gid:gid,
+            order:index,
+            privateData: privateDataList[index], //de-normalized
             answer: null
-          }           
-        }}, {multi: true});
+        }
+        });
       });  
     },
-    UpdateAnswer: function (gid, uid, guess) {
-      Players.update({'_id': uid, 'game.gid': gid},
-      {
-        $set: { game:{
-          answer: guess
-        }
-      }
-      });
+    UpdateAnswer: function (uid, gid, guess) {
+      Players.update(
+        {'uid': uid, 'gid':gid},
+        {
+          $set: {
+            createdAt: new Date(),     
+            answer: guess}
+        });
     },
     random: function (number, p) {
         var result = [];

@@ -20,6 +20,8 @@ ecmascript              # Enable ECMAScript2015+ syntax in app code
 iron:router
 mizzao:accounts-testing
 mizzao:bootboxjs
-twbs:bootstrap
 msavin:mongol
+twbs:bootstrap
 session
+random
+

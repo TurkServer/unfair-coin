@@ -27,9 +27,10 @@
     <hr/>
     <h2>Private flip:</h2>
     <p>You've flip the coin {{counter}} times.</p>
-    <p>Result for {{currentUser.username}}: {{currentUser.game.privateData}}
-    </p>
+    <p>Result for {{#each players currentUser._id}} {{currentUser.username}}: {{privateData}} {{/each}}</p>
+      
     <button>Flip</button>
+    
     <div id="coin"></div>
     <hr/>
     
@@ -48,6 +49,11 @@
       {{#each userList}}
       <span class="badge">{{username}}</span> 
       {{/each}}
+      
+      <!--{{#each playerList}}
+      <span class="badge">{{uid}}</span> 
+      {{/each}}-->
+      
     </div>
   </div>
 </template>
