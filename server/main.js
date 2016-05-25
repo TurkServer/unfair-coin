@@ -3,37 +3,37 @@ import { Meteor } from 'meteor/meteor';
 Meteor.startup(() => {
   // code to run on server at startup
   Games = new Mongo.Collection('games');
-  Players = new Mongo.Collection('players');
-  
-  //Generate data from server side.
-  // n game with x random coins flip in public ,  y random coins flip in private with z (Hits) users.
-  // TODO: Add x, y, z into setting.json 
-  let x = 10;
-  let y = 10;
-  let p = 0.50; //fair
-  
-  var userList = Meteor.users.find().fetch();
-  var gid =  Random.id(); // Meteor way, or custom: Meteor.call('makeid');
-
-  Meteor.call('Generator', gid, x, y, p, userList);
-
-  Meteor.publish("Games", function() {
-    return Games.find({ gid: gid });
-  });
-
-  Meteor.publish("Users", function() {
-    return Meteor.users.find();
-  });
-  
-  Meteor.publish("Players", function() {
-    return Players.find({ gid: gid });
-  });
-  
+  Players = new Mongo.Collection('players');      
 });
 
 
 Meteor.methods({
-     Generator: function (gid, x, y, p, userList) {
+      Start: function (){
+        //TODO - Connect with Turkserver: Once all users login move to startup.
+        
+        // n game with x random coins flip in public,  y random coins flip in private with z (Hits) users.
+        // TODO: Add into setting.json 
+        var x= 10; //publicFlips
+        var y= 10; //privateFlips
+        var p = 0.5; //fair
+        var gid =  Random.id(); // Meteor way, or custom: Meteor.call('makeid');
+        var userList = Meteor.users.find().fetch();
+        Meteor.call('Generator', gid, x, y, p, userList);
+        
+        //publish once only once Connect to Turkserver - Ignoring duplicate publish
+        Meteor.publish("Games", function() {
+          return Games.find({gid:gid});
+        });
+                
+        Meteor.publish("Users", function() {
+          return Meteor.users.find();
+        });
+              
+        Meteor.publish("Players", function() {
+          return Players.find({gid:gid});
+        });
+      },
+      Generator: function (gid, x, y, p, userList) { // Generate data from server side.
       var publicData = Meteor.call('random', x, p);
       var privateDataList = [];
       for(var i=0;i<userList.length;i++){

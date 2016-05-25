@@ -76,7 +76,14 @@ Template.guessForm.events({
        TurkServer.submitExitSurvey(results);
    }
  });
-    
+
+Template.home.events({
+  'click button': function (e) {
+    // Start the game from client 
+    Meteor.call('Start');
+  }
+});
+
 Meteor.methods({
   flip: function(){
     //Animate: flip a coin and show H / T

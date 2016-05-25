@@ -45,12 +45,11 @@
     {{> controller}}
     
     <hr/>
-   
     <h1>Data</h1>
     <h3>Public Data:</h3>
     <div class="col-md-12">
     <div class="alert alert-info">
-    <p>{{#each games}} {{publicData}} {{/each}}
+    <p>{{#each games gameId}} {{publicData}} {{/each}}
     </p>
     </div>
     </div>
