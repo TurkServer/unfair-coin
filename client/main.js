@@ -3,24 +3,22 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import './main.html';
 
 Template.experiment.onCreated(function bodyOnCreated() {
-  // counter starts at 0
-  this.counter = new ReactiveVar(0);
-  this.result = new ReactiveVar("");
-
   Meteor.subscribe("Games");
   MongoGames = new Mongo.Collection('games'); 
 
   Meteor.subscribe("Users");
   
   Meteor.subscribe("Players");
-  MongoPlayers = new Mongo.Collection('players');
+  MongoPlayers = new Mongo.Collection('players'); 
+});
+
+Template.controller.onCreated(function bodyOnCreated() {
+  // counter starts at 0
+  this.counter = new ReactiveVar(0);
   
 });
 
 Template.experiment.helpers({
-  counter() {
-    return Template.instance().counter.get();
-  },
   games: function() {
     return MongoGames.find({}, { sort: { createdAt: -1 } });
   },
@@ -29,11 +27,17 @@ Template.experiment.helpers({
   }
 })
 
-Template.experiment.events({
+Template.controller.events({
   'click button'(event, instance) {
     // increment the counter when button is clicked
     instance.counter.set(instance.counter.get() + 1);
     //Meteor.call("flip");
+  }
+});
+
+Template.controller.helpers({
+  counter: function() {
+    return Template.instance().counter.get();
   }
 });
 

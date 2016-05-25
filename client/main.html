@@ -3,8 +3,30 @@
   <head>
     <title>Unfair Coin Game</title>
   </head>
-  Please accept the HIT to continue. {{> info}}
-  <a href="/experiment">Start</a>
+   <div class="alert alert-info fade in">Please accept the HIT to continue. </div>
+   {{> info}}
+   <a href="/experiment"><button type="button" class="btn btn-primary">Start</button></a>
+</template>
+
+
+<template name="info">
+  <div class="page-header">
+    <h2>How to play</h2>
+  </div>
+    <p>1. You will be arranged to a random table with random workers.</p>
+    <p>2. You share the public information with others.</p>
+    <p>3. You have private information that only you can access.</p>
+    <p>4. Submit a guess for the possibility of the coin in the end.</p>
+  <div class="page-header">
+    <h2>Q &amp; A</h2>
+  </div>
+    <p>Q: Can I share my private information with others?</p>
+    <p>A: No.</p>
+    <p>Q: Can I submit whenever I am ready?</p>
+    <p>A: Yes.</p>
+    <p>Q: Strategy to get max bonus?</p>
+    <p>A: Depends... </p>
+  <img src="img/flip-a-coin.gif" class="img-rounded" alt="Flip a coin" width="304" height="236">
 </template>
 
 
@@ -18,45 +40,51 @@
 
   <body>
     <h1>Welcome to Unfair Coin Game!</h1>
-    <h2>Public flip:</h2>
-    <p>Result: {{#each games}} {{publicData}} {{/each}}
+    <img src='img/table.png' style='width:100%'/>
+     
+    {{> controller}}
+    
+    <hr/>
+   
+    <h1>Data</h1>
+    <h3>Public Data:</h3>
+    <div class="col-md-12">
+    <div class="alert alert-info">
+    <p>{{#each games}} {{publicData}} {{/each}}
     </p>
-
-    <h2>Players:</h2> {{> userTable}}
-
+    </div>
+    </div>
+    <h3>Players:</h3> {{> userTable}}
     <hr/>
-    <h2>Private flip:</h2>
-    <p>You've flip the coin {{counter}} times.</p>
-    <p>Result for {{#each players currentUser._id}} {{currentUser.username}}: {{privateData}} {{/each}}</p>
-      
-    <button>Flip</button>
-    
-    <div id="coin"></div>
-    <hr/>
-    
-    {{> guessForm}}
+    <h3>Private Data for {{currentUser.username}}:</h3>
+    <div class="col-md-12">
+    <div class="alert alert-info"> 
+    <p>{{#each players currentUser._id}} {{privateData}} {{/each}}</p>
+    </div>
+    </div>
   </body>
 </template>
 
-
-<template name="info">
-  <h2>Learn Rules about how to play?</h2>
+<template name="controller">
+   <div>
+    {{> coin}}
+     
+    <p>You've flip the coin {{counter}} times.</p>
+    <button id="flip">Flip</button>
+   </div>
+    {{> guessForm}}
 </template>
 
-<template name="userTable">
-  <div class="col-md-12">
-    <div class="alert alert-info">
-      {{#each userList}}
-      <span class="badge">{{username}}</span> 
-      {{/each}}
-      
-      <!--{{#each playerList}}
-      <span class="badge">{{uid}}</span> 
-      {{/each}}-->
-      
+<template name="coin">
+  <div id="coin-flip-cont">
+    <div id="coin">
+      <div class="front"></div>
+      <div class="back"></div>
     </div>
   </div>
 </template>
+
+
 
 <template name="guessForm">
   <form id="guess" name="guessForm" class="guess">
@@ -68,6 +96,24 @@
       <input type="submit" id="submit"/>
   </form>
 </template>
+
+
+
+<template name="userTable">
+  <div class="col-md-12">
+    <div class="alert alert-info">
+      {{#each userList}}
+      <span class="badge">{{username}}</span> 
+      {{/each}}  
+     <!--      
+      {{#each playerList}}
+      <span class="badge">{{uid}}</span> 
+      {{/each}}
+      -->
+    </div>
+  </div>
+</template>
+
 
 <template name="survey">
   <form class="survey">
