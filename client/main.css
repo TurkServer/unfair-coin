@@ -4,6 +4,7 @@ h1{
 }
 input[type="range"] {
   width: 30%;
+  margin: auto;
 }
 
 html, body {
@@ -13,6 +14,7 @@ height: 100%;
 }
 
 #coin-flip-table {
+  margin: auto;
   position: relative;
   height:800px;
   width:1200px;
@@ -24,6 +26,8 @@ height: 100%;
 
 .controller{
     margin-top:30px;
+    text-align: center;
+  
 }
 
 .hide{
