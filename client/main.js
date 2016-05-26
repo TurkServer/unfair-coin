@@ -30,7 +30,9 @@ Template.experiment.helpers({
 Template.controller.events({
   'click button'(event, instance) {
     // increment the counter when button is clicked
-    instance.counter.set(instance.counter.get() + 1);
+    if(instance.counter.get()<10){
+      instance.counter.set(instance.counter.get() + 1);
+    }
     //Meteor.call("flip");
   }
 });

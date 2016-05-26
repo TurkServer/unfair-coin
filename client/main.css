@@ -12,24 +12,61 @@ width: 100%;
 height: 100%;
 }
 
+#coin-flip-table {
+  position: relative;
+  height:800px;
+  width:1200px;
+  /*min-width: 1200px;
+  max-width: 1200px;
+  min-height: 800px;
+  max-height: 800px;*/
+}
+
+.controller{
+    margin-top:30px;
+}
+
+.hide{
+  display:none;
+}
+
+#coin-flip-table .public-board{
+  color:  white;
+  position: absolute;
+  top: calc(50% - 100px);
+  left: calc(50% - 320px);
+}
+
+#coin-flip-table .private-board{
+  color:  white;
+  position: absolute;
+  top: calc(50% - -100px);
+  left: calc(50% - 320px);
+}
+
+#coin-flip-table .private-board .item{
+  display:none;
+}
+
+
 #coin-flip-cont {
-width: 200px;
-height: 200px;
-position: absolute;
-top: calc(50% - 100px);
-left: calc(50% - 100px);
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: calc(50% - 0px);
+  left: calc(50% - 50px);
 }
 
 #coin {
 position: relative;
-width: 200px;
+width: 100px;
 transform-style: preserve-3d;
 }
 
 #coin .front, #coin .back {
 position: absolute;
-width: 200px;
-height: 200px;
+width: 100px;
+height: 100px;
 }
 
 #coin .front {
@@ -42,6 +79,11 @@ background-color: #3498db;
 transform: translateZ(-1px) rotateY(180deg);
 border-radius: 50%;
 background-color: #2ecc71;
+}
+
+#coin .front .img-rounded,
+#coin .back .img-rounded{
+  border-radius:50px;
 }
 
 #coin.animation900 {

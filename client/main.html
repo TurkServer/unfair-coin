@@ -40,8 +40,27 @@
 
   <body>
     <h1>Welcome to Unfair Coin Game!</h1>
-    <img src='img/table.png' style='width:100%'/>
+   
+     <div id="coin-flip-table">
+     <img src='img/table.png' style='width:100%'/>
+     {{> coin}}
      
+     <div class="public-board">
+     <h3>Public: {{#each games gameId}} {{publicData}} {{/each}}</h3>
+     </div>
+     
+     <div class="private-board">
+     <h3>Private: {{#each players currentUser._id}} 
+          {{#each privateData}}
+              <span id="flip-{{@index}}" class="item" data-value="{{@index}}">{{this}}</span>
+          {{/each}}
+       {{/each}}
+     </h3>
+     </div>
+     
+     </div>
+  
+    
     {{> controller}}
     
     <hr/>
@@ -63,27 +82,27 @@
     </div>
   </body>
 </template>
-
-<template name="controller">
-   <div>
-    {{> coin}}
-     
-    <p>You've flip the coin {{counter}} times.</p>
-    <button id="flip">Flip</button>
-   </div>
-    {{> guessForm}}
-</template>
-
+  
 <template name="coin">
   <div id="coin-flip-cont">
     <div id="coin">
-      <div class="front"></div>
-      <div class="back"></div>
+      <div class="front"> <img src="img/coin-head.png" class="img-rounded" alt="coin-head" width="100" height="100"></div>
+      <div class="back"> <img src="img/coin-tail.jpg" class="img-rounded" alt="coin-tail" width="100" height="100"></div>
     </div>
   </div>
+  <audio controls id="link-coin-audio" class="hide">
+    <source src="sound/coin-drop.mp3" type="audio/mpeg">
+    Muted.
+  </audio>
 </template>
 
-
+<template name="controller">
+    <div class="controller">
+      <p>You've flip the coin {{counter}} times.</p>
+      <button id="flip" class="btn btn-success" onclick="showNextFlip({{counter}})">Flip</button>
+    </div>
+    {{> guessForm}}
+</template>
 
 <template name="guessForm">
   <form id="guess" name="guessForm" class="guess">
@@ -92,7 +111,7 @@
       <input name="slider" type="range" min="0" max="100" value="0" step="1" onchange="showValue(this.value)" />
       <span id="range">0</span>
       <br/>
-      <input type="submit" id="submit"/>
+      <input id="submit" type="submit" class="btn btn-info btn-lg disabled"/>
   </form>
 </template>
 
