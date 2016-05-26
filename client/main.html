@@ -103,8 +103,8 @@
 
 <template name="controller">
     <div class="controller">
-      <p>You've flip the coin {{counter}} times.</p>
-      <button id="flip" class="btn btn-success" onclick="showNextFlip({{counter}})">Flip</button>
+      <h4>You've flip the coin {{counter}} times.</h4>
+      <button id="flip" class="btn btn-success btn-lg" onclick="showNextFlip({{counter}})">Flip</button>
      
       {{> guessForm}}
     </div>
@@ -112,10 +112,10 @@
 
 <template name="guessForm">
   <form id="guess" name="guessForm" class="guess">
-      Guess possibility:
+      <h4>Guess possibility:</h4>
       <br/>
       <input id="guess-slider" name="slider" type="range" min="0" max="100" value="0" step="1" onchange="showValue(this.value)" />
-      <span id="range">0</span>
+      <h3><span id="range">0</span></h3>
       <br/>
       <input id="submit" type="submit" class="btn btn-info btn-lg disabled"/>
   </form>
