@@ -31,44 +31,43 @@
 
 
 <template name="experiment">
-  
-  <head>
-    <title>Unfair Coin</title>
-    <link href='css/coin.css' rel="stylesheet">
-    <script type="text/javascript" src="js/coin.js"></script>
-  </head>
 
-  <body>
     <h1>Welcome to Unfair Coin Game!</h1>
-   
+
      <div id="coin-flip-table">
      <img id="ppl-1" src='img/ppl-1.jpg' style='position: absolute;top:200px;left:20px;'/>
      <img id="ppl-2" src='img/ppl-2.jpg' style='position: absolute;top:40px;left:540px;'/>
      <img id="ppl-3" src='img/ppl-3.jpg' style='position: absolute;top:220px;right:40px;'/>
-     
+
      <img src='img/table.png' style='width:100%'/>
      {{> coin}}
-     
+
      <div class="public-board">
-     <h3>Public: {{#each games gameId}} {{publicData}} {{/each}}</h3>
+     <h3>Public: {{> displayFlips publicFlips}}</h3>
      </div>
-     
+
      <div class="private-board">
-     <h3>Private: {{#each players currentUser._id}} 
-          {{#each privateData}}
-              <span id="flip-{{@index}}" class="item" data-value="{{@index}}">{{this}}</span>
-          {{/each}}
-       {{/each}}
+     <h3>Private: {{> displayFlips privateFlips}}
      </h3>
      </div>
-     
+
      </div>
-  
-    
+
+    <hr>
+
+    <div class="container">
+    {{#if allGuessed}}
+    {{> userTable}}
+    {{else}}
+    <span class="alert alert-info">Waiting for everyone to guess...</span>
     {{> controller}}
-    
-    <hr/>
-    
+    {{/if}}
+    </div>
+
+    <hr>
+
+    {{> testForm}}
+
       <!--<h1>Data</h1>
       <h3>Public Data:</h3>
       <div class="col-md-12">
@@ -77,19 +76,19 @@
         </p>
         </div>
       </div>
-      
-      <h3>Players:</h3> {{> userTable}}
-      
+
       <hr/>
-      
+
       <h3>Private Data for {{currentUser.username}}:</h3>
       <div class="col-md-12">
-        <div class="alert alert-info"> 
+        <div class="alert alert-info">
         <p>{{#each players currentUser._id}} {{privateData}} {{/each}}</p>
         </div>
       </div>-->
-    
-  </body>
+</template>
+
+<template name="displayFlips">
+    {{ flipSeq }} ({{heads}} out of {{total}})
 </template>
   
 <template name="coin">
@@ -107,41 +106,63 @@
 
 <template name="controller">
     <div class="controller">
-      <h4>You've flip the coin {{counter}} times.</h4>
-      <button id="flip" class="btn btn-success btn-lg" onclick="showNextFlip({{counter}})">Flip</button>
-     
+        <!--
+      <button id="flip" class="btn btn-success btn-lg">See my private
+          info</button>
+          -->
+
       {{> guessForm}}
     </div>
 </template>
 
 <template name="guessForm">
   <form id="guess" name="guessForm" class="guess">
+      {{#if iGuessed }}
+      You guessed: {{ myAnswer }}
+      {{else}}
       <h4>Guess possibility:</h4>
       <br/>
-      <input id="guess-slider" name="slider" type="range" min="0" max="100" value="0" step="1" onchange="showValue(this.value)" />
-      <h3><span id="range">0</span></h3>
+      <input id="guess-slider" name="slider" type="range" min="0" max="100" value="50" step="1">
+      <h3><span id="range">{{guessValue}}</span></h3>
       <br/>
-      <input id="submit" type="submit" class="btn btn-info btn-lg disabled"/>
+      <input id="submit" type="submit" class="btn btn-info btn-lg">
+      {{/if}}
   </form>
 </template>
 
-
-
 <template name="userTable">
-  <div class="col-md-12">
-    <div class="alert alert-info">
-      {{#each userList}}
-      <span class="badge">{{username}}</span> 
-      {{/each}}  
-     <!--      
-      {{#each playerList}}
-      <span class="badge">{{uid}}</span> 
-      {{/each}}
-      -->
-    </div>
-  </div>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>User</th>
+            <th>Guess</th>
+            <th>Payoff</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#each guesses}}
+            <tr>
+                <td>{{username}}</td>
+                <td>{{answer}}</td>
+                <td><b class="alert-danger">{{winner}}</b></td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+        <h3>True probability: {{prob}}</h3>
 </template>
 
+<template name="testForm">
+    <div class="container">
+    <form class="form-inline">
+        Public: <input class="form-control" name="public"
+               type="number" min="1" max="20" required>
+        Private: <input class="form-control" name="private"
+               type="number" min="1" max="20" required>
+        <button class="btn btn-primary">New Game</button>
+    </form>
+    </div>
+</template>
 
 <template name="survey">
   <form class="survey">

@@ -1,97 +1,94 @@
 import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check'
 
-Meteor.startup(() => {
-  // code to run on server at startup
-  Games = new Mongo.Collection('games');
-  Players = new Mongo.Collection('players');      
+// Update publications once connected to Turkserver
+Meteor.publish("Games", function() {
+  return Games.find({}, { sort: {createdAt: -1}, limit: 1});
 });
 
+Meteor.publish("Users", function() {
+  return Meteor.users.find();
+});
+
+Meteor.publish("Guesses", function(gid) {
+  return Guesses.find({gameId: gid}); 
+});
+
+// Draw a random probability from the uniform prior.
+function drawProb() {
+  return Math.random();
+}
+
+// Flip a biased coin. Returns true with probability p.
+function flipCoin(p) {
+  if (Math.random() < p) return true;
+  return false;
+}
+
+function binomialFlips(n, p) {
+  const result = [];
+  for( let i = 0; i < n; i++ ) {
+    result.push(flipCoin(p));
+  }
+  return result;
+}
 
 Meteor.methods({
-      Start: function (){
-        //TODO - Connect with Turkserver: Once all users login move to startup.
-        
-        // n game with x random coins flip in public,  y random coins flip in private with z (Hits) users.
-        // TODO: Add into setting.json 
-        var x= 10; //publicFlips
-        var y= 10; //privateFlips
-        var p = 0.5; //fair
-        var gid =  Random.id(); // Meteor way, or custom: Meteor.call('makeid');
-        var userList = Meteor.users.find().fetch();
-        Meteor.call('Generator', gid, x, y, p, userList);
-        
-        //publish once only once Connect to Turkserver - Ignoring duplicate publish
-        Meteor.publish("Games", function() {
-          return Games.find({gid:gid});
-        });
-                
-        Meteor.publish("Users", function() {
-          return Meteor.users.find();
-        });
-              
-        Meteor.publish("Players", function() {
-          return Players.find({gid:gid});
-        });
-      },
-      Generator: function (gid, x, y, p, userList) { // Generate data from server side.
-      var publicData = Meteor.call('random', x, p);
-      var privateDataList = [];
-      for(var i=0;i<userList.length;i++){
-        let privateData = Meteor.call('random', y,p);
-        privateDataList.push(privateData);
-      }
-      Games.insert({
-          gid: gid,
-          createdAt: new Date(),
-          publicData: publicData,
-          privateDataList: privateDataList,
-          answer: p
-      });
-     
-     Meteor.call('AssignUsers', gid, userList, privateDataList);
-    },
-    AssignUsers: function (gid, userList, privateDataList) {
-      userList.forEach(function(item, index){
-        Players.upsert(
-        {'uid': item._id, 'gid':gid},
-        {
-          $set: {
-            createdAt: new Date(),     
-            gid:gid,
-            order:index,
-            privateData: privateDataList[index], //de-normalized
-            answer: null
-        }
-        });
-      });  
-    },
-    UpdateAnswer: function (uid, gid, guess) {
-      Players.update(
-        {'uid': uid, 'gid':gid},
-        {
-          $set: {
-            createdAt: new Date(),     
-            answer: guess}
-        });
-    },
-    random: function (number, p) {
-        var result = [];
-        for(var i=0;i<number;i++){
-            var x = (Math.floor(Math.random() * 2) == 0); //fair   //TODO: unfair by p affect
-            if(x){
-              result.push("Head");
-            }else{
-              result.push("Tail");
-            }
-        }
-        return result;
-    },
-    makeid: function(){
-          var text = "flip_a_coin_game_id_";
-          var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  newGame: function (n_p, n_v){
+    // TODO - Connect with Turkserver: Once all users login move to startup.
+    check(n_p, Number);
+    check(n_v, Number);
 
-          for( var i=0; i < 5; i++ )
-              text += possible.charAt(Math.floor(Math.random() * possible.length));
-          return text;
-   }
+    // n game with x random coins flip in public,  y random coins flip in private with z (Hits) users.
+    // TODO: Add into setting.json
+    const p = drawProb();
+
+    // Set up game with number of online users
+    const userIds =
+      Meteor.users.find({"status.online": true}).map((u) => u._id);
+
+    // Generate data from server side.
+    const publicData = binomialFlips(n_p, p);
+    const privateDataList = [];
+    for (let i = 0; i < userIds.length; i++) {
+      privateDataList.push( binomialFlips(n_v, p) );
+    }
+
+    // Store game
+    const gameId = Games.insert({
+      createdAt: new Date(),
+      publicData: publicData,
+      privateDataList: privateDataList,
+      prob: p
+    });
+
+    // Assign users to roles in random order
+    _.shuffle(userIds).forEach(function(userId, idx) {
+      Guesses.insert({
+        userId,
+        gameId,
+        order: idx,
+        privateData: privateDataList[idx], //de-normalized
+        answer: null
+      });
+    });
+  },
+  updateAnswer: function (gameId, guess) {
+    const userId = Meteor.userId();
+    check(userId, String);
+
+    const update = Guesses.update({
+      userId: userId,
+      gameId,
+      answer: null
+    },
+    {
+      $set: {
+        createdAt: new Date(),
+        answer: guess
+      }
+    });
+
+    if (update === 0) throw new Meteor.Error(400, "Already updated");
+  },
 });

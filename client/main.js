@@ -4,33 +4,62 @@ import './main.html';
 
 Template.experiment.onCreated(function bodyOnCreated() {
   Meteor.subscribe("Games");
-  MongoGames = new Mongo.Collection('games'); 
-
   Meteor.subscribe("Users");
   
-  Meteor.subscribe("Players");
-  MongoPlayers = new Mongo.Collection('players'); 
+  Tracker.autorun(function() {
+    const game = Games.findOne();
+    const gameId = game && game._id;
+    if (!gameId) return;
+    Meteor.subscribe("Guesses", gameId);
+  });
+  
 });
 
 Template.controller.onCreated(function bodyOnCreated() {
   // counter starts at 0
   this.counter = new ReactiveVar(0);
-  
 });
 
 Template.experiment.helpers({
-  games: function() {
-    return MongoGames.find({}, { sort: { createdAt: -1 } });
+  allGuessed: function() {
+    const gs = Guesses.find().map(g => g.answer);
+    return gs.length > 0 && _.every(gs, (a) => a != null);
+  },
+  game: function() {
+    return Games.find({}, { sort: { createdAt: -1 } });
+  },
+  publicFlips: function() {
+    const g = Games.findOne();
+    return g && g.publicData;
   },
   players: function(uid) {
-    return MongoPlayers.find({uid: uid}, { sort: { createdAt: -1 } });
+    return Guesses.find({uid: uid}, { sort: { createdAt: -1 } });
+  },
+  privateFlips: function() {
+    const guess = Guesses.findOne({userId: Meteor.userId()});
+    return guess && guess.privateData;
   }
-})
+});
+
+Template.displayFlips.helpers({
+  flipSeq: function() {
+    if (!Array.isArray(this)) return;
+    return this.map((h) => h ? "H" : "T").join("");
+  },
+  heads: function() {
+    if (!Array.isArray(this)) return;
+    return this.filter((h) => h).length;
+  },
+  total: function() {
+    if (!Array.isArray(this)) return;
+    return this.length;
+  }
+});
 
 Template.controller.events({
   'click button'(event, instance) {
     // increment the counter when button is clicked
-    if(instance.counter.get()<10){
+    if( instance.counter.get() < 10 ){
       instance.counter.set(instance.counter.get() + 1);
     }
     //Meteor.call("flip");
@@ -44,31 +73,68 @@ Template.controller.helpers({
 });
 
 Template.userTable.helpers({
-  userList: function() {
-    //Tracker.nonreactive(function() { console.log(Meteor.users.find().fetch()); });
-    return Meteor.users.find({}, { fields: { username: 1 } });
+  prob: function() {
+    const g = Games.findOne();
+    return g && g.prob.toFixed(3);
   },
-  playerList: function() {
-    return MongoPlayers.find({}, { sort: { createdAt: -1 } });
+  username: function() {
+    const user = Meteor.users.findOne(this.userId);
+    return user && user.username;
+  },
+  guesses: function() {
+    return Guesses.find();
+  },
+  winner: function() {
+    if ( this.answer == null ) return "";
+    const p = Games.findOne().prob;
+    const myDiff = Math.abs(this.answer - p);
+    const allDiffs = Guesses.find().map((g) => Math.abs(g.answer - p));
+
+    if (_.every(allDiffs, (d) => d >= myDiff) ) return "WINNER";
   }
 });
 
-Template.guessForm.events({
-  'change input[type=range]': function(e){
-     var sliderValue = e.currentTarget.value;
-     Session.set('guessSliderValue', sliderValue/100);
-     //then you can get this session and return it in a helper to display on your page
+Template.guessForm.onCreated(function() {
+  this.guessValue = new ReactiveVar(0.5);
+});
+
+Template.guessForm.helpers({
+  iGuessed: function() {
+    const g = Guesses.findOne({userId: Meteor.userId()});
+    return g && g.answer != null;
   },
-   'submit #guess'(e) {   //#guess .guess
-      console.log('Submitting user guess from form! - ', event); //Retrive value from Event obj
-      console.log('value from session =', Session.get('guessSliderValue')); //Meteor way: To persist it.
-      console.log('value from e =', e.target.slider.value/100); //REST way: to persist it.
-      event.preventDefault();
-      event.stopPropagation();
-      return false; 
+  myAnswer: function() {
+    const g = Guesses.findOne({userId: Meteor.userId()});
+    return g && g.answer;
+  },
+   "guessValue": function() {
+     return Template.instance().guessValue.get().toFixed(2);
    }
- });
- 
+});
+
+Template.guessForm.events({
+  'input input[type=range]': function(e, t){
+     const sliderValue = e.currentTarget.value;
+     t.guessValue.set(sliderValue / 100);
+  },
+  'submit #guess': function(e, t) {   //#guess .guess
+    e.preventDefault();
+    const gameId = Games.findOne()._id;
+    const guess = t.guessValue.get();
+    Meteor.call("updateAnswer", gameId, guess);
+  }
+});
+
+Template.testForm.events({
+  'submit form': function(e) {   //#guess .guess
+    e.preventDefault();
+    const n_p = parseInt(e.target.public.value);
+    const n_v = parseInt(e.target.private.value);
+
+    Meteor.call("newGame", n_p, n_v);
+  }
+});
+
  Template.survey.events({
    'submit .survey': function (e) {
      e.preventDefault();
@@ -80,10 +146,10 @@ Template.guessForm.events({
  });
 
 Template.home.events({
-  'click button': function (e) {
-    // Start the game from client 
-    Meteor.call('Start');
-  }
+  // 'click button': function (e) {
+  //   // Start the game from client
+  //   Meteor.call('Start');
+  // }
 });
 
 Meteor.methods({
