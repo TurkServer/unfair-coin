@@ -1,13 +1,18 @@
-<template name="home">
-
-  <head>
+<head>
     <title>Unfair Coin Game</title>
-  </head>
+</head>
+
+<template name="defaultLayout">
+    <div class="container">
+        {{> yield}}
+    </div>
+</template>
+
+<template name="home">
    <div class="alert alert-info fade in">Please accept the HIT to continue. </div>
    {{> info}}
    <a href="/experiment"><button type="button" class="btn btn-primary">Start</button></a>
 </template>
-
 
 <template name="info">
   <div class="page-header">

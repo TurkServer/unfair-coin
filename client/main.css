@@ -1,16 +1,7 @@
 /* CSS declarations go here */
-h1{
-  text-align: center;
-}
 input[type="range"] {
   width: 30%;
   margin: auto;
-}
-
-html, body {
-margin: 0;
-width: 100%;
-height: 100%;
 }
 
 #coin-flip-table {
@@ -27,7 +18,6 @@ height: 100%;
 .controller{
     margin-top:30px;
     text-align: center;
-  
 }
 
 .hide{
