@@ -2,20 +2,20 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import './main.html';
 
-Template.experiment.onCreated(function bodyOnCreated() {
+Template.experiment.onCreated(function () {
   Meteor.subscribe("Games");
   Meteor.subscribe("Users");
   
-  Tracker.autorun(function() {
+  // Subscribe to guesses, but stop when template is destroyed 
+  this.autorun(function() {
     const game = Games.findOne();
     const gameId = game && game._id;
     if (!gameId) return;
     Meteor.subscribe("Guesses", gameId);
   });
-  
 });
 
-Template.controller.onCreated(function bodyOnCreated() {
+Template.controller.onCreated(function () {
   // counter starts at 0
   this.counter = new ReactiveVar(0);
 });
@@ -28,16 +28,8 @@ Template.experiment.helpers({
   game: function() {
     return Games.find({}, { sort: { createdAt: -1 } });
   },
-  publicFlips: function() {
-    const g = Games.findOne();
-    return g && g.publicData;
-  },
   players: function(uid) {
     return Guesses.find({uid: uid}, { sort: { createdAt: -1 } });
-  },
-  privateFlips: function() {
-    const guess = Guesses.findOne({userId: Meteor.userId()});
-    return guess && guess.privateData;
   }
 });
 

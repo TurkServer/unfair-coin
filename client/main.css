@@ -1,18 +1,14 @@
 /* CSS declarations go here */
+.centered {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
 input[type="range"] {
   width: 30%;
   margin: auto;
-}
-
-#coin-flip-table {
-  margin: auto;
-  position: relative;
-  height:800px;
-  width:1200px;
-  /*min-width: 1200px;
-  max-width: 1200px;
-  min-height: 800px;
-  max-height: 800px;*/
 }
 
 .controller{
@@ -34,14 +30,13 @@ input[type="range"] {
 #coin-flip-table .private-board{
   color:  white;
   position: absolute;
-  top: calc(50% - -100px);
+  top: calc(50% + 100px);
   left: calc(50% - 320px);
 }
 
 #coin-flip-table .private-board .item{
   display:none;
 }
-
 
 #coin-flip-cont {
   width: 100px;

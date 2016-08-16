@@ -34,68 +34,6 @@
   <img src="img/flip-a-coin.gif" class="img-rounded" alt="Flip a coin" width="304" height="236">
 </template>
 
-
-<template name="experiment">
-
-    <h1>Welcome to Unfair Coin Game!</h1>
-
-     <div id="coin-flip-table">
-     <img id="ppl-1" src='img/ppl-1.jpg' style='position: absolute;top:200px;left:20px;'/>
-     <img id="ppl-2" src='img/ppl-2.jpg' style='position: absolute;top:40px;left:540px;'/>
-     <img id="ppl-3" src='img/ppl-3.jpg' style='position: absolute;top:220px;right:40px;'/>
-
-     <img src='img/table.png' style='width:100%'/>
-     {{> coin}}
-
-     <div class="public-board">
-     <h3>Public: {{> displayFlips publicFlips}}</h3>
-     </div>
-
-     <div class="private-board">
-     <h3>Private: {{> displayFlips privateFlips}}
-     </h3>
-     </div>
-
-     </div>
-
-    <hr>
-
-    <div class="container">
-    {{#if allGuessed}}
-    {{> userTable}}
-    {{else}}
-    <span class="alert alert-info">Waiting for everyone to guess...</span>
-    {{> controller}}
-    {{/if}}
-    </div>
-
-    <hr>
-
-    {{> testForm}}
-
-      <!--<h1>Data</h1>
-      <h3>Public Data:</h3>
-      <div class="col-md-12">
-        <div class="alert alert-info">
-        <p>{{#each games gameId}} {{publicData}} {{/each}}
-        </p>
-        </div>
-      </div>
-
-      <hr/>
-
-      <h3>Private Data for {{currentUser.username}}:</h3>
-      <div class="col-md-12">
-        <div class="alert alert-info">
-        <p>{{#each players currentUser._id}} {{privateData}} {{/each}}</p>
-        </div>
-      </div>-->
-</template>
-
-<template name="displayFlips">
-    {{ flipSeq }} ({{heads}} out of {{total}})
-</template>
-  
 <template name="coin">
   <div id="coin-flip-cont">
     <div id="coin">
@@ -107,54 +45,6 @@
     <source src="sound/coin-drop.mp3" type="audio/mpeg">
     Muted.
   </audio>
-</template>
-
-<template name="controller">
-    <div class="controller">
-        <!--
-      <button id="flip" class="btn btn-success btn-lg">See my private
-          info</button>
-          -->
-
-      {{> guessForm}}
-    </div>
-</template>
-
-<template name="guessForm">
-  <form id="guess" name="guessForm" class="guess">
-      {{#if iGuessed }}
-      You guessed: {{ myAnswer }}
-      {{else}}
-      <h4>Guess possibility:</h4>
-      <br/>
-      <input id="guess-slider" name="slider" type="range" min="0" max="100" value="50" step="1">
-      <h3><span id="range">{{guessValue}}</span></h3>
-      <br/>
-      <input id="submit" type="submit" class="btn btn-info btn-lg">
-      {{/if}}
-  </form>
-</template>
-
-<template name="userTable">
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>User</th>
-            <th>Guess</th>
-            <th>Payoff</th>
-        </tr>
-        </thead>
-        <tbody>
-        {{#each guesses}}
-            <tr>
-                <td>{{username}}</td>
-                <td>{{answer}}</td>
-                <td><b class="alert-danger">{{winner}}</b></td>
-            </tr>
-        {{/each}}
-        </tbody>
-    </table>
-        <h3>True probability: {{prob}}</h3>
 </template>
 
 <template name="testForm">

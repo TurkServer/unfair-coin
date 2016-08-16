@@ -1,0 +1,107 @@
+<template name="experiment">
+    <div class="col-md-12">
+        {{> coinTable}}
+    </div>
+
+    <hr>
+
+    <div class="container">
+        {{#if allGuessed}}
+            {{> userTable}}
+        {{else}}
+            <span class="alert alert-info">Waiting for everyone to guess...</span>
+            {{> controller}}
+        {{/if}}
+    </div>
+
+    <hr>
+
+    {{> testForm}}
+
+    <!--<h1>Data</h1>
+      <h3>Public Data:</h3>
+      <div class="col-md-12">
+        <div class="alert alert-info">
+        <p>{{#each games gameId}} {{publicData}} {{/each}}
+        </p>
+        </div>
+      </div>
+
+      <hr/>
+
+      <h3>Private Data for {{currentUser.username}}:</h3>
+      <div class="col-md-12">
+        <div class="alert alert-info">
+        <p>{{#each players currentUser._id}} {{privateData}} {{/each}}</p>
+        </div>
+      </div>-->
+</template>
+
+<template name="coinTable">
+    <div class="flex-equal-horz">
+    {{#each opponents}}
+    <div>
+        <img src='img/ppl-{{imageHash}}.jpg' class="centered">
+        <h3 class="centered">{{oppName}} ({{numPrivate}} flips)</h3>
+    </div>
+    {{/each}}
+    </div>
+
+    <div class="public-board">
+        <img src='img/table.png' class="centered">
+        <h3 class="public-info">Public: {{> displayFlips publicFlips}}</h3>
+    </div>
+
+    <div class="private-board">
+        <h3 class="centered">Private: {{> displayFlips privateFlips}}</h3>
+    </div>
+
+</template>
+
+<template name="displayFlips">
+    {{ flipSeq }} ( {{heads}} heads / {{total}} flips )
+</template>
+
+
+<template name="controller">
+    <div class="controller">
+        {{> guessForm}}
+    </div>
+</template>
+
+<template name="guessForm">
+    <form id="guess" name="guessForm" class="guess">
+        {{#if iGuessed }}
+            You guessed: {{ myAnswer }}
+        {{else}}
+            <h4>Guess possibility:</h4>
+            <br/>
+            <input id="guess-slider" name="slider" type="range" min="0" max="100" value="50" step="1">
+            <h3><span id="range">{{guessValue}}</span></h3>
+            <br/>
+            <input id="submit" type="submit" class="btn btn-info btn-lg">
+        {{/if}}
+    </form>
+</template>
+
+<template name="userTable">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>User</th>
+            <th>Guess</th>
+            <th>Payoff</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#each guesses}}
+            <tr>
+                <td>{{username}}</td>
+                <td>{{answer}}</td>
+                <td><b class="alert-danger">{{winner}}</b></td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+    <h3>True probability: {{prob}}</h3>
+</template>
