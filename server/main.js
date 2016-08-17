@@ -34,13 +34,11 @@ function binomialFlips(n, p) {
 }
 
 Meteor.methods({
-  newGame: function (n_p, n_v){
+  newGame: function (n_p, n_v, incentive, delphi){
     // TODO - Connect with Turkserver: Once all users login move to startup.
     check(n_p, Number);
     check(n_v, Number);
 
-    // n game with x random coins flip in public,  y random coins flip in private with z (Hits) users.
-    // TODO: Add into setting.json
     const p = drawProb();
 
     // Set up game with number of online users
@@ -59,7 +57,9 @@ Meteor.methods({
       createdAt: new Date(),
       publicData: publicData,
       privateDataList: privateDataList,
-      prob: p
+      prob: p,
+      incentive,
+      delphi
     });
 
     // Assign users to roles in random order
@@ -73,6 +73,7 @@ Meteor.methods({
       });
     });
   },
+
   updateAnswer: function (gameId, guess) {
     const userId = Meteor.userId();
     check(userId, String);
@@ -90,5 +91,7 @@ Meteor.methods({
     });
 
     if (update === 0) throw new Meteor.Error(400, "Already updated");
+
+    // TODO: if all users in this game have updated, compute payoffs
   },
 });

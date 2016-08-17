@@ -122,8 +122,10 @@ Template.testForm.events({
     e.preventDefault();
     const n_p = parseInt(e.target.public.value);
     const n_v = parseInt(e.target.private.value);
+    const incentive = e.target.incentive.value;
+    const delphi = e.target.delphi.checked;
 
-    Meteor.call("newGame", n_p, n_v);
+    Meteor.call("newGame", n_p, n_v, incentive, delphi);
   }
 });
 
