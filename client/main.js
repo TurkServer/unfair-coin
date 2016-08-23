@@ -64,28 +64,6 @@ Template.controller.helpers({
   }
 });
 
-Template.userTable.helpers({
-  prob: function() {
-    const g = Games.findOne();
-    return g && g.prob.toFixed(3);
-  },
-  username: function() {
-    const user = Meteor.users.findOne(this.userId);
-    return user && user.username;
-  },
-  guesses: function() {
-    return Guesses.find();
-  },
-  winner: function() {
-    if ( this.answer == null ) return "";
-    const p = Games.findOne().prob;
-    const myDiff = Math.abs(this.answer - p);
-    const allDiffs = Guesses.find().map((g) => Math.abs(g.answer - p));
-
-    if (_.every(allDiffs, (d) => d >= myDiff) ) return "WINNER";
-  }
-});
-
 Template.guessForm.onCreated(function() {
   this.guessValue = new ReactiveVar(0.5);
 });
@@ -126,6 +104,9 @@ Template.testForm.events({
     const delphi = e.target.delphi.checked;
 
     Meteor.call("newGame", n_p, n_v, incentive, delphi);
+  },
+  'click .reset-payoffs': function() {
+    Meteor.call("resetPayoffs");
   }
 });
 

@@ -85,12 +85,14 @@
 </template>
 
 <template name="userTable">
+    <h3>True probability: {{prob}}</h3>
     <table class="table table-striped">
         <thead>
         <tr>
             <th>User</th>
             <th>Guess</th>
-            <th>Payoff</th>
+            <th>Last Payoff</th>
+            <th>Total Payoff</th>
         </tr>
         </thead>
         <tbody>
@@ -98,10 +100,10 @@
             <tr>
                 <td>{{username}}</td>
                 <td>{{answer}}</td>
-                <td><b class="alert-danger">{{winner}}</b></td>
+                <td>{{payoff}}</td>
+                <td>{{total}}</td>
             </tr>
         {{/each}}
         </tbody>
     </table>
-    <h3>True probability: {{prob}}</h3>
 </template>

@@ -92,6 +92,86 @@ Meteor.methods({
 
     if (update === 0) throw new Meteor.Error(400, "Already updated");
 
-    // TODO: if all users in this game have updated, compute payoffs
+    // If all users in this game have updated, compute payoffs
+    // TODO: fix potential race conditions here
+    if ( Guesses.find({ gameId, answer: null}).count() === 0 ) {
+      console.log("Computing payoffs");
+      Meteor.call("computePayoffs", gameId);
+    }
   },
+
+  computePayoffs: function(gameId) {
+    const game = Games.findOne(gameId);
+    if (game == null) throw new Meteor.Error(400, "No such game");
+
+    const actualProb = game.prob;
+
+    const gs = Guesses.find({gameId, answer: {$ne: null}}).fetch();
+    if (gs.length !== game.privateDataList.length) {
+      throw new Meteor.Error(400, "Wrong number of players");
+    }
+
+    if ( game.incentive === "ind" ) {
+      // Everyone gets paid according to a scoring rule
+      for( let guess of gs ) {
+        const payoff = Scoring.qsrPayoff(actualProb, guess.answer);
+        addPayoff(game._id, guess.userId, payoff);
+      }
+    }
+
+    else if ( game.incentive === "comp" ) {
+      // Only the person who is closest gets paid. Ties split equally.
+      for( let guess of gs ) {
+        guess.diff = Math.abs(guess.answer - actualProb);
+      }
+
+      // Grab the set of people with minimum diffs
+      let lowest = 1.1, lgs;
+
+      for( let guess of gs ) {
+        if (guess.diff < lowest) {
+          lowest = guess.diff;
+          lgs = [ ];
+        }
+
+        if (guess.diff <= lowest) {
+          lgs.push(guess);
+        }
+      }
+
+      const payoff = gs.length / lgs.length;
+
+      for( let guess of lgs ) {
+        addPayoff(game._id, guess.userId, payoff)
+      }
+    }
+
+    else if ( game.incentive === "coll" ) {
+      // Everyone gets paid by average, according to a scoring rule
+      const sum = gs.reduce( (acc, cur) => acc + cur.answer, 0);
+      const mean = sum / gs.length;
+      const payoff = Scoring.qsrPayoff(actualProb, mean);
+
+      for( let guess of gs ) {
+        addPayoff(game._id, guess.userId, payoff);
+      }
+    }
+
+    else {
+      throw new Meteor.Error(400, "Unknown incentive");
+    }
+  },
+
+  // Prototyping function. Resets payoffs earned so far in the game.
+  resetPayoffs: function() {
+    Meteor.users.update({}, {
+      $unset: {profit: null}
+    }, {multi: true});
+  }
 });
+
+function addPayoff(gameId, userId, payoff) {
+  Guesses.update({gameId, userId}, {$set: {payoff} });
+  // For testing purposes, record cumulative payoff
+  Meteor.users.update(userId, {$inc: {profit: payoff}});
+}

@@ -12,3 +12,23 @@ Template.coinTable.helpers({
   }
 });
 
+Template.userTable.helpers({
+  prob: function() {
+    const g = Games.findOne();
+    return g && g.prob.toFixed(3);
+  },
+  username: function() {
+    const user = Meteor.users.findOne(this.userId);
+    return user && user.username;
+  },
+  guesses: function() {
+    return Guesses.find();
+  },
+  payoff: function() {
+    return this.payoff.toFixed(3);
+  },
+  total: function() {
+    const user = Meteor.users.findOne(this.userId);
+    return (user && user.profit || 0.0).toFixed(3);
+  }
+});
