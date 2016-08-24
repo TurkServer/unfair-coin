@@ -15,11 +15,6 @@ Template.experiment.onCreated(function () {
   });
 });
 
-Template.controller.onCreated(function () {
-  // counter starts at 0
-  this.counter = new ReactiveVar(0);
-});
-
 Template.experiment.helpers({
   allGuessed: function() {
     const gs = Guesses.find().map(g => g.answer);
@@ -45,53 +40,6 @@ Template.displayFlips.helpers({
   total: function() {
     if (!Array.isArray(this)) return;
     return this.length;
-  }
-});
-
-Template.controller.events({
-  'click button'(event, instance) {
-    // increment the counter when button is clicked
-    if( instance.counter.get() < 10 ){
-      instance.counter.set(instance.counter.get() + 1);
-    }
-    //Meteor.call("flip");
-  }
-});
-
-Template.controller.helpers({
-  counter: function() {
-    return Template.instance().counter.get();
-  }
-});
-
-Template.guessForm.onCreated(function() {
-  this.guessValue = new ReactiveVar(0.5);
-});
-
-Template.guessForm.helpers({
-  iGuessed: function() {
-    const g = Guesses.findOne({userId: Meteor.userId()});
-    return g && g.answer != null;
-  },
-  myAnswer: function() {
-    const g = Guesses.findOne({userId: Meteor.userId()});
-    return g && g.answer;
-  },
-   "guessValue": function() {
-     return Template.instance().guessValue.get().toFixed(2);
-   }
-});
-
-Template.guessForm.events({
-  'input input[type=range]': function(e, t){
-     const sliderValue = e.currentTarget.value;
-     t.guessValue.set(sliderValue / 100);
-  },
-  'submit #guess': function(e, t) {   //#guess .guess
-    e.preventDefault();
-    const gameId = Games.findOne()._id;
-    const guess = t.guessValue.get();
-    Meteor.call("updateAnswer", gameId, guess);
   }
 });
 

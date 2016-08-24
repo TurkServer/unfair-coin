@@ -1,7 +1,4 @@
-function showValue(newValue) {
-  document.getElementById("range").innerHTML = newValue / 100;
-}
-  
+
 function showNextFlip(index) {
   try{
     var result=document.getElementById("flip-" + index).innerText;

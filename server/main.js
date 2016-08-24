@@ -74,6 +74,26 @@ Meteor.methods({
     });
   },
 
+  // TODO: make this not rely solely on client-side logic
+  updateDelphi: function (gameId, guess) {
+    const userId = Meteor.userId();
+    check(userId, String);
+
+    const update = Guesses.update({
+        userId: userId,
+        gameId,
+        delphi: {$exists: false}
+      },
+      {
+        $set: {
+          delphiAt: new Date(),
+          delphi: guess
+        }
+      });
+
+    if (update === 0) throw new Meteor.Error(400, "Already updated");
+  },
+  
   updateAnswer: function (gameId, guess) {
     const userId = Meteor.userId();
     check(userId, String);
