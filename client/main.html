@@ -9,20 +9,8 @@
 </template>
 
 <template name="home">
-   <div class="alert alert-info fade in">Please accept the HIT to continue. </div>
-   {{> info}}
-   <a href="/experiment"><button type="button" class="btn btn-primary">Start</button></a>
-</template>
-
-<template name="info">
-  <div class="page-header">
-    <h2>How to play</h2>
-  </div>
-    <p>1. You will be arranged to a random table with random workers.</p>
-    <p>2. You share the public information with others.</p>
-    <p>3. You have private information that only you can access.</p>
-    <p>4. Submit a guess for the possibility of the coin in the end.</p>
-  <img src="img/flip-a-coin.gif" class="img-rounded" alt="Flip a coin" width="304" height="236">
+   {{> instGeneral}}
+   <a class="btn btn-primary" href="/experiment">Start</a>
 </template>
 
 <template name="coin">

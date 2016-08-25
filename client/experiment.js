@@ -3,6 +3,8 @@ function delphiGame() {
   return game && game.delphi;
 }
 
+Template.registerHelper('delphiGame', delphiGame);
+
 Template.controller.helpers({
   delphiActive: function() {
     // Delphi is active if the game is delphi and some guesses are incomplete
@@ -10,7 +12,6 @@ Template.controller.helpers({
     const guesses = Guesses.find({delphi: {$exists: false}}).fetch();
     return guesses.length > 0;
   },
-  delphiGame,
   iGuessedDelphi: function() {
     const g = Guesses.findOne({userId: Meteor.userId()});
     return g && g.delphi != null;
