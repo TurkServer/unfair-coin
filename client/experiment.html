@@ -45,43 +45,52 @@
     {{#each opponents}}
     <div>
         <img src='img/ppl-{{imageHash}}.jpg' class="centered">
-        <h3 class="centered">{{oppName}} ({{numPrivate}} flips)</h3>
+        <h3 class="centered">{{oppName}}</h3>
+	<h3>({{numPrivate}} private flips)</h3>
+	<h3> 
+	  {{#if oppoGuessed}}
+	  Guess submitted
+	  {{else}}
+	  Guess not submitted yet
+	  {{/if}}
+	</h3>
     </div>
     {{/each}}
     </div>
 
+
     <div class="public-board">
-        <img src='img/table.png' class="centered">
-        <h3 class="public-info">Public: {{> displayFlips publicFlips}}</h3>
+        <!--img src='img/table.png' class="centered" -->
+        <h3 class="public-info">Public flips: {{> displayFlips publicFlips}}</h3>
     </div>
 
     <div class="private-board">
-        <h3 class="centered">Private: {{> displayFlips privateFlips}}</h3>
+        <h3 class="centered">Your private flips: {{> displayFlips privateFlips}}</h3>
     </div>
 
 </template>
 
 <template name="displayFlips">
-    {{ flipSeq }} ( {{heads}} heads / {{total}} coins )
+    {{heads}} heads / {{total}} flips ( {{ flipSeq }} )
 </template>
 
 <template name="controller">
     <div class="controller">
         {{#if delphiActive}}
             {{#if iGuessedDelphi }}
-                You guessed: <b>{{ myDelphi }}</b>
+                <h3>You guessed: <b>{{ myDelphi }}</b></h3>
                 <br>
-                <b class="text-warning">Waiting for others to submit their
-                    initial guess.</b>
+                <b class="text-warning">Round 1: Waiting for others to submit their
+                    initial guesses.</b>
             {{else}}
-                <b class="text-danger">This is a preliminary round. You get
+                <b class="text-danger">Round 1: Please enter your initial guess.  You will have
                     a chance to change your guess afterward.
                 </b>
                 {{> guessForm}}
             {{/if}}
         {{else}}
             {{#if iGuessed}}
-                You guessed: <b>{{ myAnswer }}</b>
+                <h3>You guessed: <b>{{ myAnswer }}</b></h3>
                 <br>
                 <b class="text-warning">Waiting for others.</b>
             {{else}}
@@ -108,7 +117,7 @@
             {{/each}}
         </g>
     </svg>
-    <p>You can now change your guess if you would like.</p>
+    <p>Please change your guess if you like.</p>
 </template>
 
 <template name="guessForm">
@@ -128,8 +137,28 @@
 </template>
 
 <template name="userTable">
-    <h3>Actual probability was: {{prob}}</h3>
-    <table class="table table-striped">
+    <h3># of heads in 100 new flips is: {{prob}}</h3>
+    <h3>
+      
+        {{#if isCollInc}}
+            Average guess: {{ avgGuess }}
+        {{else}}
+            Your guess: {{ myAnswer }}
+        {{/if}}
+    </h3>
+    <h3>      
+      {{# if isCompInc}}
+        {{# if myWinStatus }}
+          Congratulations, you won!
+        {{else}}
+          You did not win.
+        {{/if}}
+        You earned a bonus of ${{ myPayoff }}
+      {{else}}
+        You earned a bonus of ${{ myPayoff }}
+      {{/if}}
+    </h3>
+    <!--table class="table table-striped">
         <thead>
         <tr>
             <th>User</th>
@@ -148,5 +177,5 @@
             </tr>
         {{/each}}
         </tbody>
-    </table>
+    </table-->
 </template>
