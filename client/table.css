@@ -25,3 +25,7 @@
     stroke-dasharray: 5,5;
     stroke-width: 1;
 }
+
+.mean {
+    fill: #112233;
+}

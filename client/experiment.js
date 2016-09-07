@@ -5,13 +5,21 @@ function delphiGame() {
 
 Template.registerHelper('delphiGame', delphiGame);
 
+/**
+ * Whether the current game is a delphi game and in the delphi phase.
+ * if the game is delphi and some guesses are incomplete, then we are in
+ * the delphi phase
+ * @returns {boolean}
+ */
+function delphiPhase() {
+  if ( !delphiGame() ) return false;
+  const guesses = Guesses.find({delphi: {$exists: false}}).fetch();
+  return guesses.length > 0;
+}
+
+Template.registerHelper('delphiPhase', delphiPhase);
+
 Template.controller.helpers({
-  delphiActive: function() {
-    // Delphi is active if the game is delphi and some guesses are incomplete, if we are in round 1.
-    if ( !delphiGame() ) return false;
-    const guesses = Guesses.find({delphi: {$exists: false}}).fetch();
-    return guesses.length > 0;
-  },
   iGuessedDelphi: function() {
     const g = Guesses.findOne({userId: Meteor.userId()});
     return g && g.delphi != null;
@@ -30,16 +38,36 @@ Template.controller.helpers({
   }
 });
 
+function mapX(value) {
+  return value * 400 - 200;
+}
+
+// Scaling values calculated from SVG display
 Template.delphiDisplay.helpers({
   x: function() {
-    return this.delphi && (this.delphi * 400 - 200);
+    return this.delphi && mapX(this.delphi);
   },
   y: function(index) {
     return (index != null) && (index * 15 + 10);
   },
   displayValue: function() {
     return this.delphi && (this.delphi * 100);
+  }
+});
+
+Template.resultDisplay.helpers({
+  x: function() {
+    return this.answer && mapX(this.answer);
   },
+  y: function(index) {
+    return (index != null) && (index * 15 + 10);
+  },
+  displayValue: function() {
+    return this.answer && (this.answer * 100);
+  },
+  xMean: function() {
+    return this.mean && mapX(this.mean);
+  }
 });
 
 Template.guessForm.onCreated(function() {
@@ -122,20 +150,6 @@ Template.userTable.helpers({
   myPayoff: function() {
     const myGuess = Guesses.findOne({userId: Meteor.userId()});
     return (myGuess && myGuess.payoff || 0.00).toFixed(2);
-  },
-  isCollInc: function() {
-    const g = Games.findOne();
-    return g.incentive === "coll";
-  },
-  isCompInc: function() {
-    const g = Games.findOne();
-    return g.incentive === "comp";
-  },
-  avgGuess: function() {
-    const gs = Guesses.find({answer: {$ne: null}}).fetch();
-    const sum = gs.reduce( (acc, cur) => acc + cur.answer, 0);
-    const mean = sum / gs.length; 
-    return (mean * 100).toFixed(0);
   },
   prob: function() {
     const g = Games.findOne();

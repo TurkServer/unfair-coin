@@ -131,6 +131,12 @@ Meteor.methods({
       throw new Meteor.Error(400, "Wrong number of players");
     }
 
+    // Store average guess for this game, both for data purposes and since
+    // we might use it to compute a payoff later
+    const sum = gs.reduce( (acc, cur) => acc + cur.answer, 0);
+    const mean = sum / gs.length;
+    Games.update(game._id, {$set: { mean }});
+
     if ( game.incentive === "ind" ) {
       // Everyone gets paid according to a scoring rule
       for( let guess of gs ) {
@@ -168,13 +174,12 @@ Meteor.methods({
 
     else if ( game.incentive === "coll" ) {
       // Everyone gets paid by average, according to a scoring rule
-      const sum = gs.reduce( (acc, cur) => acc + cur.answer, 0);
-      const mean = sum / gs.length;
       const payoff = Scoring.qsrPayoff(actualProb, mean);
 
       for( let guess of gs ) {
         addPayoff(game._id, guess.userId, payoff);
       }
+             
     }
 
     else {

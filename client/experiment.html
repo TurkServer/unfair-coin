@@ -103,8 +103,30 @@
     </div>
 </template>
 
+<!-- Shows everyone's guesses during the delphi phase. -->
 <template name="delphiDisplay">
-    <p><b>Here's what everyone thinks so far:</b></p>
+    <h3>Here's what everyone thinks so far:</h3>
+
+    <svg width="500" height="100">
+        <g transform="translate(250,20)">
+            <line class="number-line" x1="-200" x2="200" y1="0" y2="0"></line>
+            {{#each guesses}}
+            <circle cx={{x}} cy="0" r="8"></circle>
+            <line class="dotted-line" x1={{x}} x2={{x}} y1="0"
+                  y2={{y @index}}></line>
+            <text x={{x}} y={{y @index}} dy="1em"
+                  text-anchor="middle">{{displayValue}}</text>
+            {{/each}}
+        </g>
+    </svg>
+
+    <p>Please change your guess if you like.</p>
+</template>
+
+<!-- Shows everyone's guesses in the final result. -->
+<template name="resultDisplay">
+    <h3>Results:</h3>
+
     <svg width="500" height="100">
         <g transform="translate(250,20)">
             <line class="number-line" x1="-200" x2="200" y1="0" y2="0"></line>
@@ -115,9 +137,12 @@
                 <text x={{x}} y={{y @index}} dy="1em"
                       text-anchor="middle">{{displayValue}}</text>
             {{/each}}
+            {{! Show mean guess if in collaborative treatment }}
+            {{#if isCollInc}}
+                <circle class="mean" cx={{xMean}} cy="0" r="8"></circle>
+            {{/if}}
         </g>
     </svg>
-    <p>Please change your guess if you like.</p>
 </template>
 
 <template name="guessForm">
@@ -139,7 +164,6 @@
 <template name="userTable">
     <h3># of heads in 100 new flips is: {{prob}}</h3>
     <h3>
-      
         {{#if isCollInc}}
             Average guess: {{ avgGuess }}
         {{else}}

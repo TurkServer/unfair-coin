@@ -17,3 +17,14 @@ Template.registerHelper('privateFlips', () => {
   return guess && guess.privateData;
 });
 
+// Whether the current game is using the collaborative incentive
+Template.registerHelper('isCollInc', function() {
+  const g = Games.findOne();
+  return g && g.incentive === "coll";
+});
+
+// Whether the current game is using the winner-take-all incentive
+Template.registerHelper('isCompInc', function() {
+  const g = Games.findOne();
+  return g && g.incentive === "comp";
+});
