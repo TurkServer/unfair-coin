@@ -13,5 +13,6 @@ Router.route('/experiment', {
 });
 
 Router.route('/survey', function() {
-    this.render('survey');
+  this.render('survey');
 });
+
