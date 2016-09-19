@@ -14,18 +14,3 @@
     left: 50%; /* position the left edge of the element at the middle of the parent */
     transform: translate(-50%, -50%); /* This is a shorthand of translateX(-50%) and translateY(-50%) */
 }
-
-.number-line {
-    stroke: #000000;
-    stroke-width: 2
-}
-
-.dotted-line {
-    stroke: #000000;
-    stroke-dasharray: 5,5;
-    stroke-width: 1;
-}
-
-.mean {
-    fill: #112233;
-}

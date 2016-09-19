@@ -123,24 +123,29 @@
     <p>Please change your guess if you like.</p>
 </template>
 
-<!-- Shows everyone's guesses in the final result. -->
+<!-- Shows everyone's guesses in the final result.
+    To make this easier to display, layout doesn't need to be reactive.
+-->
 <template name="resultDisplay">
     <h3>Results:</h3>
 
-    <svg width="500" height="100">
-        <g transform="translate(250,20)">
-            <line class="number-line" x1="-200" x2="200" y1="0" y2="0"></line>
-            {{#each guesses}}
-                <circle cx={{x}} cy="0" r="8"></circle>
-                <line class="dotted-line" x1={{x}} x2={{x}} y1="0"
-                      y2={{y @index}}></line>
-                <text x={{x}} y={{y @index}} dy="1em"
-                      text-anchor="middle">{{displayValue}}</text>
-            {{/each}}
-            {{! Show mean guess if in collaborative treatment }}
-            {{#if isCollInc}}
-                <circle class="mean" cx={{xMean}} cy="0" r="8"></circle>
-            {{/if}}
+    <svg width="{{c 'width'}}" height="{{c 'height'}}">
+        {{! arrowhead - http://vanseodesign.com/web-design/svg-markers/ }}
+        <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refx="8" refy="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="#000" />
+            </marker>
+        </defs>
+
+        {{! number line layout }}
+        <g class="line-group" transform="translate({{middle}},{{c 'lineY'}})">
+            <line class="number-line" x1="{{c 'left'}}" x2="{{c 'right'}}"
+                  y1="0" y2="0"></line>
+            {{! guess values drawn here }}
+        </g>
+        {{! result and payoff layout }}
+        <g class="node-group" transform="translate({{middle}},{{c 'nodeY'}})">
+            {{! text and lines are drawn here }}
         </g>
     </svg>
 </template>
@@ -163,6 +168,7 @@
 
 <template name="userTable">
     <h3># of heads in 100 new flips is: {{prob}}</h3>
+    {{> resultDisplay}}
     <h3>
         {{#if isCollInc}}
             Average guess: {{ avgGuess }}

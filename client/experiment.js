@@ -1,3 +1,5 @@
+import * as d3 from 'd3';
+
 function delphiGame() {
   const game = Games.findOne();
   return game && game.delphi;
@@ -38,10 +40,6 @@ Template.controller.helpers({
   }
 });
 
-function mapX(value) {
-  return value * 400 - 200;
-}
-
 // Scaling values calculated from SVG display
 Template.delphiDisplay.helpers({
   x: function() {
@@ -55,19 +53,93 @@ Template.delphiDisplay.helpers({
   }
 });
 
+const dispConf = {
+  // SVG size
+  width: 800,
+  height: 200,
+  // How wide the number line is, left to right
+  left: -300,
+  right: 300,
+  lineY: 50, // vert pos of the number line
+  nodeY: 150, // vert pos of text
+};
+
 Template.resultDisplay.helpers({
-  x: function() {
-    return this.answer && mapX(this.answer);
-  },
-  y: function(index) {
-    return (index != null) && (index * 15 + 10);
-  },
-  displayValue: function() {
-    return this.answer && (this.answer * 100);
-  },
-  xMean: function() {
-    return this.mean && mapX(this.mean);
-  }
+  c: function(str) { return dispConf[str]; },
+  middle: function() { return dispConf.width / 2; }
+});
+
+function isMe(g) {
+  return g.userId && g.userId === Meteor.userId();
+}
+
+// Draw number line for feedback using d3
+Template.resultDisplay.onRendered(function() {
+  // Config parameters
+  
+  // Later, this can support delphi as well
+  const field = "answer";
+  
+  const svg = d3.select(this.find('svg'));
+  const height = this.$('svg').height();
+  const width = this.$('svg').width();
+  
+  // Sort by field so arrows don't cross
+  const gs = Guesses.find({}, {sort: {[field]: 1}}).fetch();
+  
+  const x = d3.scaleLinear()
+    .domain([0, 1])
+    .range([ dispConf.left, dispConf.right ]);
+  
+  // Ordinal point scale
+  // https://github.com/d3/d3-scale/blob/master/README.md#scalePoint 
+  const ord = d3.scalePoint()
+    .domain(gs.map(g => g._id))
+    .range([ dispConf.left/2, dispConf.right/2 ]);
+
+  function linPos(g) { return g[field] && x(g[field]) }
+  function ordPos(g) { return ord(g._id) }
+
+  const lineGroup = svg.select('.line-group');
+
+  // Draw guesses on number line
+  lineGroup.selectAll('.value')
+    .data(gs)
+  .enter().append('circle')
+    .attr('class', 'value')
+    .attr('cx', linPos)
+    .attr('cy', 0)
+    .attr('r', 8);
+
+  // TODO: draw mean value in collaborative treatment
+  
+  const nodeGroup = svg.select('.node-group');
+
+  const f = d3.format('.0f');
+  
+  // Draw text values
+  nodeGroup.selectAll('rect')
+    .data(gs)
+  .enter().append('text')
+    .attr('class', g => isMe(g) ? "me" : "")
+    .attr('text-anchor', 'middle')
+    .attr('font-size', 30)
+    .attr('x', ordPos)
+    .attr('y', 0)
+    .text(g => g[field] && f(g[field] * 100))
+
+  // Draw arrows to number line values
+  nodeGroup.selectAll('line')
+    .data(gs)
+  .enter().append('line')
+    .attr('class', g => isMe(g) ? "me" : "")
+    .attr('stroke', '#000')
+    .attr('stroke-width', 2)
+    .attr('marker-end', 'url(#arrow)')
+    .attr('x1', ordPos)
+    .attr('y1', -25)
+    .attr('x2', linPos)
+    .attr('y2', 15 + dispConf.lineY - dispConf.nodeY)
 });
 
 Template.guessForm.onCreated(function() {
