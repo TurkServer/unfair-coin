@@ -5,12 +5,18 @@ svg {
     stroke-width: 2
   }
 
+  .actual {
+    stroke: #3c763d;
+    fill: #3c763d;
+  }
+
   .mean {
-    fill: #112233;
+    stroke: #8a6d3b;
+    fill: #8a6d3b;
   }
 
   .me {
-    stroke: orangered;
-    fill: orangered;
+    stroke: #31708f;
+    fill: #31708f;
   }
 }

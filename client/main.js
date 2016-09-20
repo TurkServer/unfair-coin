@@ -5,27 +5,14 @@ import './main.html';
 Template.experiment.onCreated(function () {
   Meteor.subscribe("Games");
   Meteor.subscribe("Users");
-  
+
   // Subscribe to guesses, but stop when template is destroyed 
-  this.autorun(function() {
+  this.autorun( function() {
     const game = Games.findOne();
     const gameId = game && game._id;
     if (!gameId) return;
     Meteor.subscribe("Guesses", gameId);
   });
-});
-
-Template.experiment.helpers({
-  allGuessed: function() {
-    const gs = Guesses.find().map(g => g.answer);
-    return gs.length > 0 && _.every(gs, (a) => a != null);
-  },
-  game: function() {
-    return Games.find({}, { sort: { createdAt: -1 } });
-  },
-  players: function(uid) {
-    return Guesses.find({uid: uid}, { sort: { createdAt: -1 } });
-  }
 });
 
 Template.displayFlips.helpers({

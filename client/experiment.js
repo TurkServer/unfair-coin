@@ -21,6 +21,13 @@ function delphiPhase() {
 
 Template.registerHelper('delphiPhase', delphiPhase);
 
+Template.experiment.helpers({
+  allGuessed: function() {
+    const gs = Guesses.find().map(g => g.answer);
+    return gs.length > 0 && _.every(gs, (a) => a != null);
+  }
+});
+
 Template.controller.helpers({
   iGuessedDelphi: function() {
     const g = Guesses.findOne({userId: Meteor.userId()});
@@ -37,19 +44,6 @@ Template.controller.helpers({
   myAnswer: function() {
     const g = Guesses.findOne({userId: Meteor.userId()});
     return g && (g.answer * 100).toFixed(0);
-  }
-});
-
-// Scaling values calculated from SVG display
-Template.delphiDisplay.helpers({
-  x: function() {
-    return this.delphi && mapX(this.delphi);
-  },
-  y: function(index) {
-    return (index != null) && (index * 15 + 10);
-  },
-  displayValue: function() {
-    return this.delphi && (this.delphi * 100);
   }
 });
 
@@ -76,9 +70,9 @@ function isMe(g) {
 // Draw number line for feedback using d3
 Template.resultDisplay.onRendered(function() {
   // Config parameters
-  
-  // Later, this can support delphi as well
-  const field = "answer";
+  // Field can be "delphi" to show delphi results
+  const field = this.data || "answer";
+  console.log(field);
   
   const svg = d3.select(this.find('svg'));
   const height = this.$('svg').height();
@@ -86,7 +80,10 @@ Template.resultDisplay.onRendered(function() {
   
   // Sort by field so arrows don't cross
   const gs = Guesses.find({}, {sort: {[field]: 1}}).fetch();
-  
+  const game = Games.findOne();
+
+  console.log(gs);
+
   const x = d3.scaleLinear()
     .domain([0, 1])
     .range([ dispConf.left, dispConf.right ]);
@@ -97,26 +94,23 @@ Template.resultDisplay.onRendered(function() {
     .domain(gs.map(g => g._id))
     .range([ dispConf.left/2, dispConf.right/2 ]);
 
+  const f = d3.format('.0f');
+
   function linPos(g) { return g[field] && x(g[field]) }
   function ordPos(g) { return ord(g._id) }
 
   const lineGroup = svg.select('.line-group');
+  const nodeGroup = svg.select('.node-group');
 
   // Draw guesses on number line
-  lineGroup.selectAll('.value')
+  lineGroup.selectAll('.guess')
     .data(gs)
   .enter().append('circle')
-    .attr('class', 'value')
+    .attr('class', 'guess')
     .attr('cx', linPos)
     .attr('cy', 0)
     .attr('r', 8);
 
-  // TODO: draw mean value in collaborative treatment
-  
-  const nodeGroup = svg.select('.node-group');
-
-  const f = d3.format('.0f');
-  
   // Draw text values
   nodeGroup.selectAll('rect')
     .data(gs)
@@ -140,6 +134,41 @@ Template.resultDisplay.onRendered(function() {
     .attr('y1', -25)
     .attr('x2', linPos)
     .attr('y2', 15 + dispConf.lineY - dispConf.nodeY)
+
+  // Draw mean value in collaborative treatment
+  if ( CoinFlip.isCollInc() ) {
+    lineGroup.append('circle')
+      .attr('class', 'mean')
+      .attr('cx', x(game.mean))
+      .attr('cy', 0)
+      .attr('r', 8);
+
+    lineGroup.append('text')
+      .attr('class', 'mean')
+      .attr('text-anchor', 'middle')
+      .attr('font-size', 20)
+      .attr('x', x(game.mean))
+      .attr('y', -15)
+      .text(f(game.mean * 100))
+  }
+  
+  // Draw actual value and text
+  if( field === "answer" ) {
+    lineGroup.append('circle')
+      .attr('class', 'actual')
+      .attr('cx', x(game.prob))
+      .attr('cy', 0)
+      .attr('r', 8);
+
+    lineGroup.append('text')
+      .attr('class', 'actual')
+      .attr('text-anchor', 'middle')
+      .attr('font-size', 20)
+      .attr('x', x(game.prob))
+      .attr('y', -15)
+      .text(f(game.prob * 100))
+  }
+
 });
 
 Template.guessForm.onCreated(function() {
@@ -221,12 +250,17 @@ Template.userTable.helpers({
   },
   myPayoff: function() {
     const myGuess = Guesses.findOne({userId: Meteor.userId()});
-    return (myGuess && myGuess.payoff || 0.00).toFixed(2);
+    return '$' + (myGuess && myGuess.payoff || 0.00).toFixed(2);
   },
   prob: function() {
     const g = Games.findOne();
     return g && (g.prob * 100).toFixed(0); 
   },
+  avgGuess: function() {
+    const g = Games.findOne();
+    return g && (g.mean * 100).toFixed(0);
+  },
+  // XXX currently unused functions
   username: function() {
     const user = Meteor.users.findOne(this.userId);
     return user && user.username;
