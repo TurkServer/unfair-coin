@@ -3,12 +3,12 @@
         {{> gameInstructions}}
     </div>
 
-    <div class="col-md-12">
+    {{! Table of users next to number line}}
+    <div class="col-md-4">
         {{> coinTable}}
     </div>
 
-    {{! Only draw stuff once all data loaded }}
-    <div class="col-md-12">
+    <div class="col-md-8">
         {{#if allGuessed}}
             {{> userTable}}
         {{else}}
@@ -20,36 +20,53 @@
 </template>
 
 <template name="coinTable">
-    <div class="flex-equal-horz">
-    {{#each opponents}}
-    <div>
-        <img src='img/ppl-{{imageHash}}.jpg' class="centered">
-        <h3 class="centered">{{oppName}}</h3>
-	<h3>({{numPrivate}} private flips)</h3>
-	<h3>
-	  {{#if oppoGuessed}}
-	  Guess submitted
-	  {{else}}
-	  Guess not submitted yet
-	  {{/if}}
-	</h3>
-    </div>
-    {{/each}}
-    </div>
+    {{! Lay out all users in a simple table }}
 
-    <div class="public-board">
-        <!--img src='img/table.png' class="centered" -->
-        <h3 class="public-info">Public flips: {{> displayFlips publicFlips}}</h3>
-    </div>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>{{! User}}</th>
+            <th>{{! Info }}</th>
+            <th>Guess</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#each opponents}}
+            <tr>
+                <td>
+                    <img src='img/ppl-{{imageHash}}.jpg' height="20"> {{oppName}}
+                </td>
+                <td>({{numPrivate}} private flips)</td>
+                {{#if oppoGuessed}}
+                    <td class="success">Submitted!</td>
+                {{else}}
+                    <td class="warning">Waiting...</td>
+                {{/if}}
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
 
-    <div class="private-board">
-        <h3 class="centered">Your private flips: {{> displayFlips privateFlips}}</h3>
-    </div>
+    {{> infoDisplay }}
+</template>
 
+<template name="infoDisplay">
+    <h3><b>What everyone saw:</b></h3>
+    <h3 class="text-center">{{> displayFlips publicFlips}}</h3>
+
+    <h3><b>What you saw:</b></h3>
+    <h3 class="text-center">{{> displayFlips privateFlips}}</h3>
 </template>
 
 <template name="displayFlips">
-    {{heads}} heads / {{total}} flips ( {{ flipSeq }} )
+    {{#each this}}
+        {{#if this}}
+        <img src='img/coin-head.png' height="20">
+        {{else}}
+        <img src='img/coin-tail.jpg' height="20">
+        {{/if}}
+    {{/each}}
+    ({{heads}} heads / {{total}} flips)
 </template>
 
 <template name="controller">

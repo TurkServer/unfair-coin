@@ -15,21 +15,6 @@ Template.experiment.onCreated(function () {
   });
 });
 
-Template.displayFlips.helpers({
-  flipSeq: function() {
-    if (!Array.isArray(this)) return;
-    return this.map((h) => h ? "H" : "T").join("");
-  },
-  heads: function() {
-    if (!Array.isArray(this)) return;
-    return this.filter((h) => h).length;
-  },
-  total: function() {
-    if (!Array.isArray(this)) return;
-    return this.length;
-  }
-});
-
 Template.testForm.events({
   'submit form': function(e) {   //#guess .guess
     e.preventDefault();

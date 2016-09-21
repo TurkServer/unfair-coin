@@ -28,6 +28,17 @@ Template.experiment.helpers({
   }
 });
 
+Template.displayFlips.helpers({
+  heads: function() {
+    if (!Array.isArray(this)) return;
+    return this.filter((h) => h).length;
+  },
+  total: function() {
+    if (!Array.isArray(this)) return;
+    return this.length;
+  }
+});
+
 Template.controller.helpers({
   iGuessedDelphi: function() {
     const g = Guesses.findOne({userId: Meteor.userId()});
