@@ -9,14 +9,12 @@
     </div>
 
     <div class="col-md-8">
-        {{#if allGuessed}}
-            {{> userTable}}
-        {{else}}
-            {{> controller}}
-        {{/if}}
+        {{> controller}}
     </div>
 
+    <div class="col-md-12">
     {{> testForm}}
+    </div>
 </template>
 
 <template name="coinTable">
@@ -36,7 +34,7 @@
                 <td>
                     <img src='img/ppl-{{imageHash}}.jpg' height="20"> {{oppName}}
                 </td>
-                <td>({{numPrivate}} private flips)</td>
+                <td>(saw {{numPrivate}} flips)</td>
                 {{#if oppoGuessed}}
                     <td class="success">Submitted!</td>
                 {{else}}
@@ -54,7 +52,7 @@
     <h3><b>What everyone saw:</b></h3>
     <h3 class="text-center">{{> displayFlips publicFlips}}</h3>
 
-    <h3><b>What you saw:</b></h3>
+    <h3><b>What only you saw:</b></h3>
     <h3 class="text-center">{{> displayFlips privateFlips}}</h3>
 </template>
 
@@ -70,40 +68,48 @@
 </template>
 
 <template name="controller">
-    <div class="controller">
-        {{#if delphiPhase}}
-            {{#if iGuessedDelphi }}
-                <h3>You guessed: <b>{{ myDelphi }}</b></h3>
-                <br>
-                <b class="text-warning">Round 1: Waiting for others to submit their
-                    initial guesses.</b>
+    {{> prompt }}
+
+    {{#if finalPhase}}
+    {{> numberLine}}
+    {{/if}}
+
+    {{#if completedPhase}}
+    {{> numberLine}}
+    {{> gameResults }}
+    {{/if}}
+</template>
+
+<template name="prompt">
+    {{#if delphiPhase}}
+        {{#if myGuess.delphi }}
+            <h3 class="text-warning">Waiting for others to submit their
+                initial guesses.</h3>
+        {{else}}
+            <h3 class="text-danger">Enter an initial guess. You will have a chance to change your guess afterward.</h3>
+        {{/if}}
+    {{else}}
+        {{#if myGuess.answer}}
+            {{#if allGuessed}}
+                <h3>Here are the results:</h3>
             {{else}}
-                <b class="text-danger">Round 1: Please enter your initial guess.  You will have
-                    a chance to change your guess afterward.
-                </b>
-                {{> guessForm}}
+                <h3 class="text-warning">Waiting for everyone else to guess.</h3>
             {{/if}}
         {{else}}
-            {{#if iGuessed}}
-                <h3>You guessed: <b>{{ myAnswer }}</b></h3>
-                <br>
-                <b class="text-warning">Waiting for others.</b>
+            {{#if delphiGame}}
+                <h3>Here's what everyone thinks so far. You can now change your
+                    guess.</h3>
             {{else}}
-                {{#if delphiGame}}
-                {{! XXX this doesn't work across reloads, but OK for now }}
-                <h3>Here's what everyone thinks so far:</h3>
-                {{> resultDisplay "delphi" }}
-                {{/if}}
-                {{> guessForm}}
+                <h3>Enter your guess.</h3>
             {{/if}}
         {{/if}}
-    </div>
+    {{/if}}
 </template>
 
 <!-- Shows everyone's guesses in the delphi or result.
     To make this easier to display, layout doesn't need to be reactive.
 -->
-<template name="resultDisplay">
+<template name="numberLine">
     <svg class="center-block" width="{{c 'width'}}" height="{{c 'height'}}">
         {{! arrowhead - http://vanseodesign.com/web-design/svg-markers/ }}
         <defs>
@@ -137,9 +143,8 @@
     </form>
 </template>
 
-<template name="userTable">
-    {{> resultDisplay}}
-
+<!-- Template showing results of a game -->
+<template name="gameResults">
     {{! Show ground truth }}
     <h3 class="text-center">
         On average, this coin comes up heads

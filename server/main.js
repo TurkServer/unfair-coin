@@ -59,7 +59,8 @@ Meteor.methods({
       privateDataList: privateDataList,
       prob: p,
       incentive,
-      delphi
+      delphi,
+      phase: delphi ? "delphi" : "final"
     });
 
     // Assign users to roles in random order
@@ -92,6 +93,11 @@ Meteor.methods({
       });
 
     if (update === 0) throw new Meteor.Error(400, "Already updated");
+
+    if ( Guesses.find({ gameId, delphi: null}).count() === 0 ) {
+      // Update game phase for clients to display
+      Games.update(gameId, {$set: {phase: "final"}});
+    }
   },
   
   updateAnswer: function (gameId, guess) {
@@ -117,6 +123,8 @@ Meteor.methods({
     if ( Guesses.find({ gameId, answer: null}).count() === 0 ) {
       console.log("Computing payoffs");
       Meteor.call("computePayoffs", gameId);
+
+      Games.update(gameId, {$set: {phase: "completed"}});
     }
   },
 
