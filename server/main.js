@@ -14,9 +14,18 @@ Meteor.publish("Guesses", function(gid) {
   return Guesses.find({gameId: gid}); 
 });
 
-// Draw a random probability from the uniform prior.
+// Returns a random integer between min (included) and max (excluded)
+// Using Math.round() will give you a non-uniform distribution!
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+// Draw a random probability from the not-quite-uniform prior:
+// 0.01 through 0.99 inclusive
 function drawProb() {
-  return Math.random();
+  return getRandomInt(1, 100) / 100.0;
 }
 
 // Flip a biased coin. Returns true with probability p.
@@ -148,7 +157,7 @@ Meteor.methods({
     if ( game.incentive === "ind" ) {
       // Everyone gets paid according to a scoring rule
       for( let guess of gs ) {
-        const payoff = Scoring.qsrPayoff(actualProb, guess.answer);
+        const payoff = Scoring.linearPayoff(actualProb, guess.answer);
         addPayoff(game._id, guess.userId, payoff);
       }
     }
@@ -182,7 +191,7 @@ Meteor.methods({
 
     else if ( game.incentive === "coll" ) {
       // Everyone gets paid by average, according to a scoring rule
-      const payoff = Scoring.qsrPayoff(actualProb, mean);
+      const payoff = Scoring.linearPayoff(actualProb, mean);
 
       for( let guess of gs ) {
         addPayoff(game._id, guess.userId, payoff);

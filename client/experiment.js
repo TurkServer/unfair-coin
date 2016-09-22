@@ -66,7 +66,7 @@ Template.numberLine.onCreated(function() {
 
   // Best to use integers for this RV to avoid FP math errors
   if ( existing && existing.delphi ) {
-    this.guessValue = new ReactiveVar(existing.delphi * 100);
+    this.guessValue = new ReactiveVar(Math.round(existing.delphi * 100));
   }
   else {
     // Start with no value, which doesn't show a button
@@ -77,6 +77,11 @@ Template.numberLine.onCreated(function() {
 Template.numberLine.helpers({
   c: function(str) { return dispConf[str]; },
   middle: function() { return dispConf.width / 2; },
+  guessSubmitted: function() {
+    if( completedPhase() ) return true;
+    const g = myGuess(); 
+    return (delphiPhase() && g.delphi) || (finalPhase() && g.answer);   
+  },
   guessValue: function() {
     return Template.instance().guessValue.get();
   }
@@ -85,6 +90,9 @@ Template.numberLine.helpers({
 function isMe(g) {
   return g.userId && g.userId === Meteor.userId();
 }
+
+const f0 = d3.format('.0f');
+const f1 = d3.format('.1f');
 
 // Draw number line for feedback using d3
 Template.numberLine.onRendered(function() {
@@ -112,31 +120,43 @@ Template.numberLine.onRendered(function() {
     .domain( gs.map(g => g._id) )
     .range([ dispConf.left/2, dispConf.right/2 ]);
 
-  const f = d3.format('.0f');
-
   function linPos(g) { return g[field] && x(g[field]) }
   function ordPos(g) { return ord(g._id) }
 
   const lineGroup = svg.select('.line-group');
   const nodeGroup = svg.select('.node-group');
 
-  function onDrag() {
-    const [loc, y] = d3.mouse(lineGroup.node());
-
-    // Pass through clamped scale to get value
-    const val = x.invert(loc);
-    const rounded = (val * 100).toFixed(0);
-    svg.select("g.draggable").attr("transform", `translate(${x(val)},0)`);
-    svg.select("g.draggable text").text(rounded);
-
-    guessValue.set(rounded);
-  }
-  
-  const drag = d3.drag()
-    .on('drag', onDrag);
-
   // Set up draggable handle for guessing phases
-  svg.call(drag);
+  if( !completedPhase() ) {
+    // Position guess for delphi phase
+    let existing;
+    if ( (existing = guessValue.get()) != null ) {
+      redraw( existing );
+    }
+
+    function onDrag() {
+      const [loc, y] = d3.mouse(lineGroup.node());
+
+      // Pass through clamped scale to get value
+      const val = x.invert(loc);
+      const rounded = Math.round(val * 100);
+
+      guessValue.set(rounded);
+      redraw(rounded);
+    }
+
+    function redraw(value) {
+      svg.select("g.draggable").attr("transform", `translate(${x(value / 100)},0)`);
+      svg.select("g.draggable text").text(value);
+    }
+
+    const drag = d3.drag()
+      .on('drag', onDrag);
+
+    svg.call(drag);
+
+    this.drag = drag;
+  }
   
   // Draw guesses on number line,
   // unless in delphi phase, or final phase of non-delphi game
@@ -158,7 +178,7 @@ Template.numberLine.onRendered(function() {
       .attr('font-size', 30)
       .attr('x', ordPos)
       .attr('y', 0)
-      .text(g => g[field] && f(g[field] * 100))
+      .text(g => g[field] && f0(g[field] * 100))
 
     // Draw arrows to number line values
     nodeGroup.selectAll('line')
@@ -188,7 +208,7 @@ Template.numberLine.onRendered(function() {
       .attr('font-size', 20)
       .attr('x', x(game.mean))
       .attr('y', -15)
-      .text(f(game.mean * 100))
+      .text(f1(game.mean * 100))
   }
 
   if ( completedPhase() ) {
@@ -205,7 +225,7 @@ Template.numberLine.onRendered(function() {
       .attr('font-size', 20)
       .attr('x', x(game.prob))
       .attr('y', -15)
-      .text(f(game.prob * 100));
+      .text(f0(game.prob * 100));
   }
 
 });
@@ -224,6 +244,9 @@ Template.numberLine.events({
     else {
       Meteor.call("updateAnswer", game._id, guess);
     }
+
+    // Cancel drag behavior.
+    t.drag.on("drag", null);
   }
 });
 
@@ -253,7 +276,7 @@ Template.coinTable.helpers({
 Template.gameResults.helpers({
   myAnswer: function() {
     const myGuess = Guesses.findOne({userId: Meteor.userId()});
-    return myGuess && (myGuess.answer * 100).toFixed(0);
+    return myGuess && Math.round(myGuess.answer * 100);
   },
   myWinStatus: function() {
     const myGuess = Guesses.findOne({userId: Meteor.userId()});
@@ -265,10 +288,11 @@ Template.gameResults.helpers({
   },
   prob: function() {
     const g = Games.findOne();
-    return g && (g.prob * 100).toFixed(0); 
+    return g && Math.round(g.prob * 100);
   },
   avgGuess: function() {
     const g = Games.findOne();
-    return g && (g.mean * 100).toFixed(0);
+    // It's OK to show a decimal here
+    return g && f1(g.mean * 100);
   }
 });

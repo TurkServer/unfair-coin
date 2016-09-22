@@ -73,13 +73,11 @@
     {{> prompt }}
 
     {{#if delphiPhase}}
-    {{> numberLine "delphi" }}
-    (Test)
+    {{> numberLine }}
     {{/if}}
 
     {{#if finalPhase}}
-    {{> numberLine}}
-    (Test)
+    {{> numberLine "delphi" }}
     {{/if}}
 
     {{#if completedPhase}}
@@ -94,7 +92,9 @@
             <h3 class="text-warning">Waiting for others to submit their
                 initial guesses.</h3>
         {{else}}
-            <h3 class="text-danger">Enter an initial guess. You will have a chance to change your guess afterward.</h3>
+            <h3 class="text-danger">
+                Enter an initial guess. You will then see what others think.
+            </h3>
         {{/if}}
     {{else}}
         {{#if myGuess.answer}}
@@ -130,10 +130,15 @@
         <g class="line-group" transform="translate({{middle}},{{c 'lineY'}})">
             <line class="number-line" x1="{{c 'left'}}" x2="{{c 'right'}}"
                   y1="0" y2="0"></line>
+            <text text-anchor="end" x="{{c 'left'}}" y="-10">
+                0 of 100</text>
+            <text text-anchor="start" x="{{c 'right'}}" y="-10">
+                100 of 100</text>
+
             {{! guess values drawn here }}
             {{#unless completedPhase}}
             <g class="handle draggable">
-                <circle class="draggable" cx="0" r="8"></circle>
+                <circle class="draggable" cx="0" r="11"></circle>
                 <text class="me" text-anchor="middle" font-size="20"
                       y="-20"></text>
             </g>
@@ -145,11 +150,12 @@
         </g>
     </svg>
 
+    {{#unless guessSubmitted}}
     {{#with guessValue}}
         <button class="btn btn-primary btn-lg center-block confirm-guess">
-            Confirm your guess of {{this}}</button>
+            Confirm your guess: {{this}}</button>
     {{/with}}
-
+    {{/unless}}
 </template>
 
 <!-- Template showing results of a game -->

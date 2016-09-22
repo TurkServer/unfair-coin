@@ -8,13 +8,19 @@ Template.experiment.onCreated(function () {
 
   this.guessSubReady = new ReactiveVar(false);
 
-  // Subscribe to guesses, but stop when template is destroyed 
+  // Subscribe to guesses, but stop when template is destroyed
   this.autorun( () => {
-    const game = Games.findOne();
+    // Only react to the game id changing.
+    const game = Games.findOne({}, {fields: {_id: 1}});
     const gameId = game && game._id;
     if (!gameId) return;
+
     this.guessSubReady.set(false);
-    Meteor.subscribe("Guesses", gameId, () => this.guessSubReady.set(true));
+    console.log("Fetching new game");
+    Meteor.subscribe("Guesses", gameId, () => {
+      this.guessSubReady.set(true);
+      console.log("Ready");
+    });
   });
 });
 
