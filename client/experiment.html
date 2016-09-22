@@ -9,7 +9,9 @@
     </div>
 
     <div class="col-md-8">
+        {{#if guessesReady}}
         {{> controller}}
+        {{/if}}
     </div>
 
     <div class="col-md-12">
@@ -70,8 +72,14 @@
 <template name="controller">
     {{> prompt }}
 
+    {{#if delphiPhase}}
+    {{> numberLine "delphi" }}
+    (Test)
+    {{/if}}
+
     {{#if finalPhase}}
     {{> numberLine}}
+    (Test)
     {{/if}}
 
     {{#if completedPhase}}
@@ -90,7 +98,7 @@
         {{/if}}
     {{else}}
         {{#if myGuess.answer}}
-            {{#if allGuessed}}
+            {{#if completedPhase}}
                 <h3>Here are the results:</h3>
             {{else}}
                 <h3 class="text-warning">Waiting for everyone else to guess.</h3>
@@ -123,24 +131,25 @@
             <line class="number-line" x1="{{c 'left'}}" x2="{{c 'right'}}"
                   y1="0" y2="0"></line>
             {{! guess values drawn here }}
+            {{#unless completedPhase}}
+            <g class="handle draggable">
+                <circle class="draggable" cx="0" r="8"></circle>
+                <text class="me" text-anchor="middle" font-size="20"
+                      y="-20"></text>
+            </g>
+            {{/unless}}
         </g>
         {{! result and payoff layout }}
         <g class="node-group" transform="translate({{middle}},{{c 'nodeY'}})">
             {{! text and lines are drawn here }}
         </g>
     </svg>
-</template>
 
-<template name="guessForm">
-    <form name="guessForm" class="guess">
-        <h4>If this coin is flipped 100 more times, how many times will it
-            come up heads?</h4>
-        <br/>
-        <input id="guess-slider" name="slider" type="range" min="0" max="100" step="1">
-        <h3><span>{{guessValue}} heads</span></h3>
-        <br/>
-        <input type="submit" class="btn btn-info btn-lg">
-    </form>
+    {{#with guessValue}}
+        <button class="btn btn-primary btn-lg center-block confirm-guess">
+            Confirm your guess of {{this}}</button>
+    {{/with}}
+
 </template>
 
 <!-- Template showing results of a game -->

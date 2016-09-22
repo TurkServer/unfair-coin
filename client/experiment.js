@@ -1,4 +1,6 @@
-import * as d3 from 'd3';
+// https://forums.meteor.com/t/immutable-bindings-of-es6-modules/25118/5
+// Otherwise d3.event is not usable.
+const d3 = require('d3');
 
 function delphiGame() {
   const game = Games.findOne();
@@ -36,13 +38,6 @@ function myGuess() {
 }
 Template.registerHelper('myGuess', myGuess);
 
-Template.prompt.helpers({
-  allGuessed: function() {
-    const game = Games.findOne();
-    return game && game.phase === "final";
-  }
-});
-
 Template.displayFlips.helpers({
   heads: function() {
     if (!Array.isArray(this)) return;
@@ -65,9 +60,26 @@ const dispConf = {
   nodeY: 150, // vert pos of text
 };
 
+Template.numberLine.onCreated(function() {
+  // Set guess value to 50 unless there was a previous delphi round
+  const existing = Guesses.findOne({userId: Meteor.userId()});
+
+  // Best to use integers for this RV to avoid FP math errors
+  if ( existing && existing.delphi ) {
+    this.guessValue = new ReactiveVar(existing.delphi * 100);
+  }
+  else {
+    // Start with no value, which doesn't show a button
+    this.guessValue = new ReactiveVar();
+  }
+});
+
 Template.numberLine.helpers({
   c: function(str) { return dispConf[str]; },
-  middle: function() { return dispConf.width / 2; }
+  middle: function() { return dispConf.width / 2; },
+  guessValue: function() {
+    return Template.instance().guessValue.get();
+  }
 });
 
 function isMe(g) {
@@ -77,6 +89,7 @@ function isMe(g) {
 // Draw number line for feedback using d3
 Template.numberLine.onRendered(function() {
   const field = this.data || "answer";
+  const guessValue = this.guessValue;
   
   // Config parameters
   const svg = d3.select(this.find('svg'));
@@ -85,10 +98,11 @@ Template.numberLine.onRendered(function() {
 
   // Grab guesses, sorting by field so arrows don't cross
   const gs = Guesses.find({}, {sort: {[field]: 1}}).fetch();
-  const game = Games.findOne();
+  const game = Games.findOne();                                        
   console.log(gs);
 
   const x = d3.scaleLinear()
+    .clamp(true)
     .domain([0, 1])
     .range([ dispConf.left, dispConf.right ]);
   
@@ -106,41 +120,62 @@ Template.numberLine.onRendered(function() {
   const lineGroup = svg.select('.line-group');
   const nodeGroup = svg.select('.node-group');
 
-  // Draw guesses on number line
-  lineGroup.selectAll('.guess')
-    .data(gs, g => g._id)
-  .enter().append('circle')
-    .attr('class', 'guess')
-    .attr('cx', linPos)
-    .attr('cy', 0)
-    .attr('r', 8);
+  function onDrag() {
+    const [loc, y] = d3.mouse(lineGroup.node());
 
-  // Draw text values
-  nodeGroup.selectAll('rect')
-    .data(gs, g => g._id)
-  .enter().append('text')
-    .attr('class', g => isMe(g) ? "me" : "")
-    .attr('text-anchor', 'middle')
-    .attr('font-size', 30)
-    .attr('x', ordPos)
-    .attr('y', 0)
-    .text(g => g[field] && f(g[field] * 100))
+    // Pass through clamped scale to get value
+    const val = x.invert(loc);
+    const rounded = (val * 100).toFixed(0);
+    svg.select("g.draggable").attr("transform", `translate(${x(val)},0)`);
+    svg.select("g.draggable text").text(rounded);
 
-  // Draw arrows to number line values
-  nodeGroup.selectAll('line')
-    .data(gs, g => g._id)
-  .enter().append('line')
-    .attr('class', g => isMe(g) ? "me" : "")
-    .attr('stroke', '#000')
-    .attr('stroke-width', 2)
-    .attr('marker-end', 'url(#arrow)')
-    .attr('x1', ordPos)
-    .attr('y1', -25)
-    .attr('x2', linPos)
-    .attr('y2', 15 + dispConf.lineY - dispConf.nodeY)
+    guessValue.set(rounded);
+  }
   
+  const drag = d3.drag()
+    .on('drag', onDrag);
+
+  // Set up draggable handle for guessing phases
+  svg.call(drag);
+  
+  // Draw guesses on number line,
+  // unless in delphi phase, or final phase of non-delphi game
+  if( !( finalPhase() && !delphiGame() || delphiPhase() ) ) {
+    lineGroup.selectAll('.guess')
+      .data(gs, g => g._id)
+      .enter().append('circle')
+      .attr('class', 'guess')
+      .attr('cx', linPos)
+      .attr('cy', 0)
+      .attr('r', 8);
+
+    // Draw text values
+    nodeGroup.selectAll('rect')
+      .data(gs, g => g._id)
+      .enter().append('text')
+      .attr('class', g => isMe(g) ? "me" : "")
+      .attr('text-anchor', 'middle')
+      .attr('font-size', 30)
+      .attr('x', ordPos)
+      .attr('y', 0)
+      .text(g => g[field] && f(g[field] * 100))
+
+    // Draw arrows to number line values
+    nodeGroup.selectAll('line')
+      .data(gs, g => g._id)
+      .enter().append('line')
+      .attr('class', g => isMe(g) ? "me" : "")
+      .attr('stroke', '#000')
+      .attr('stroke-width', 2)
+      .attr('marker-end', 'url(#arrow)')
+      .attr('x1', ordPos)
+      .attr('y1', -25)
+      .attr('x2', linPos)
+      .attr('y2', 15 + dispConf.lineY - dispConf.nodeY)
+  }
+
   // Draw mean value in collaborative treatment
-  if ( CoinFlip.isCollInc() ) {
+  if ( CoinFlip.isCollInc() && completedPhase() ) {
     lineGroup.append('circle')
       .attr('class', 'mean')
       .attr('cx', x(game.mean))
@@ -156,7 +191,7 @@ Template.numberLine.onRendered(function() {
       .text(f(game.mean * 100))
   }
 
-  if ( gamePhase() === "completed" ) {
+  if ( completedPhase() ) {
     // Draw actual value and text
     lineGroup.append('circle')
       .attr('class', 'actual')
@@ -175,43 +210,15 @@ Template.numberLine.onRendered(function() {
 
 });
 
-Template.guessForm.onCreated(function() {
-  // Set guess value to 50 unless there was a previous delphi round
-  const existing = Guesses.findOne({userId: Meteor.userId()});
-
-  // Best to use integers for this RV to avoid FP math errors
-  if ( existing && existing.delphi ) {
-    this.guessValue = new ReactiveVar(existing.delphi * 100);
-  }
-  else {
-    this.guessValue = new ReactiveVar(50);
-  }
-});
-
-Template.guessForm.onRendered(function() {
-  // Set initial value on render
-  this.$("input[type=range]").val(this.guessValue.get());
-});
-
-Template.guessForm.helpers({
-  guessValue: function() {
-    return Template.instance().guessValue.get();
-  }
-});
-
-Template.guessForm.events({
-  'input input[type=range]': function(e, t){
-    const sliderValue = e.currentTarget.value;
-    t.guessValue.set(sliderValue);
-  },
-  'submit form.guess': function(e, t) {
+Template.numberLine.events({
+  // TODO debounce this to avoid double events on server
+  'click .confirm-guess': function(e, t) {
     e.preventDefault();
     const game = Games.findOne();
-    const existing = Guesses.findOne({ userId: Meteor.userId() });
     const guess = t.guessValue.get() / 100;
 
     // Is this a Delphi round or the final round?
-    if( game.delphi && existing.delphi == null ) {
+    if( gamePhase() === "delphi" ) {
       Meteor.call("updateDelphi", game._id, guess);
     }
     else {

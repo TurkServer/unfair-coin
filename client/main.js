@@ -6,13 +6,22 @@ Template.experiment.onCreated(function () {
   Meteor.subscribe("Games");
   Meteor.subscribe("Users");
 
+  this.guessSubReady = new ReactiveVar(false);
+
   // Subscribe to guesses, but stop when template is destroyed 
-  this.autorun( function() {
+  this.autorun( () => {
     const game = Games.findOne();
     const gameId = game && game._id;
     if (!gameId) return;
-    Meteor.subscribe("Guesses", gameId);
+    this.guessSubReady.set(false);
+    Meteor.subscribe("Guesses", gameId, () => this.guessSubReady.set(true));
   });
+});
+
+Template.experiment.helpers({
+  guessesReady: function() {
+    return Template.instance().guessSubReady.get();
+  }
 });
 
 Template.testForm.events({

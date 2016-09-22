@@ -5,6 +5,10 @@ svg {
     stroke-width: 2
   }
 
+  .draggable {
+    fill: hsl(0,60%,50%);
+  }
+
   .actual {
     stroke: #3c763d;
     fill: #3c763d;
