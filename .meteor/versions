@@ -58,6 +58,7 @@ minimongo@1.0.17
 mizzao:accounts-testing@0.1.0
 mizzao:bootboxjs@4.4.0
 mizzao:timesync@0.4.0
+mizzao:tutorials@0.6.7
 mizzao:user-status@0.6.6
 mobile-experience@1.0.4
 mobile-status-bar@1.0.12
@@ -83,6 +84,7 @@ spacebars@1.0.12
 spacebars-compiler@1.0.12
 standard-minifier-css@1.0.8
 standard-minifier-js@1.0.8
+stylus@2.512.5
 templating@1.1.14
 templating-tools@1.0.4
 tracker@1.0.15

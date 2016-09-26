@@ -1,0 +1,38 @@
+
+<template name="woc_tutorial">
+    {{> tutorial options}}
+</template> 
+
+<template name="tut_biased_coin">
+    <p>
+        In each game, you will be shown a biased coin.  It is tilted in favor of coming up either heads or tails.  Its chance of coming up heads could be anything between 1% and 99%.
+    </p>
+    
+    <p>
+        For example, if the coin has a 30% chance of coming up heads, then roughly, you expect to see 30 heads in 100 new flips of the coin.
+    </p>
+
+</template>
+
+<template name="tut_goal">
+    <p>
+        Your goal is to guess the number of heads in 100 new flips of the coin.  You will earn a bonus payment based on the accuracy of your guess and possibly other players' guesses.
+    </p>  
+
+</template>
+
+<template name="tut_info">
+    <p>
+        To help you make an accurate guess, you will see some coin flips.
+
+        Some flips are observed by all players, whereas other flips are only observed by a particular player.
+    </p>
+
+    <p>
+        Consider this example.
+
+        First, we will flip the coin 5 times, and all players observe the outcome of these flips.
+
+        Each player will see an additional 5 coin flips.  These private flips are only seen by that player and not by anyone else.
+    </p>
+</template>
