@@ -49,13 +49,37 @@
     </p>
 </template>
 
-<template name="tut_guess">
+<template name="tut_communication">
+
+    {{> instNoComm}}
+    {{> instDelphi}}
+</template>
+
+
+<template name="instNoComm">
+    <h2>No communication</h2>
     <p>
-      You will have 1 minute to submit your guess.  
-      
-      Also, players' guesses may be revealed to one another, and players may be allowed to revised their guesses after seeing other players' guesses.
+        You will have 1 minute to submit your guess.
+    </p>
+    <p>
+        Once all players have submitted their guesses, the game ends and we will show you all guesses and your bonus payment.
     </p>
 </template>
+
+<template name="instDelphi">
+    <h2>Delphi</h2>
+    <p>
+        There are 2 rounds of this game.
+    </p>
+    <p>
+        In round 1, you will have 30 seconds to submit your guess.  Once all players have submitted their guesses, round 1 ends and we will reveal all guesses.  
+    </p>  
+    <p>
+        In round 2, you will have another 30 seconds to revise and submit your final guess.  Once all players have submitted their final guesses, the game ends and we will show you all final guesses and your bonus payment.
+    </p>
+</template>
+
+
 
 <template name="tut_payment">
     <!-- {{> UI.dynamic template=treatmentInst}} -->
@@ -66,6 +90,7 @@
 </template>
 
 <template name="instIndiv">
+    <h2>Individual Incentive</h2>
     <p>
         Your bonus payment will depend on the accuracy of your guess.
     </p>
@@ -75,6 +100,7 @@
 </template>
 
 <template name="instComp">
+    <h2>Competitive Incentive</h2>
     <p>
         You will <b>compete</b> with the other players for a bonus payment of $1.50.
     </p>
@@ -84,6 +110,7 @@
 </template>
 
 <template name="instColl">
+    <h2>Collaborative Incentive</h2>
     <p>
         Every player will be paid the same bonus payment.  This bonus payment will depend on the accuracy of the average of all players' guesses.
     </p>
