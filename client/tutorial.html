@@ -3,6 +3,18 @@
     {{> tutorial options}}
 </template> 
 
+<template name="tut_overview">
+    <p>
+        In this experiment, our goal is to understand how to make use of the wisdom of the crowd to produce an accurate estimate of some quantity.
+    </p>
+</template>
+
+<template name="tut_player">
+    <p>
+        You will play 20 betting games.  For each game, you will be randomly matched with 4 other players and play the game with these players.
+    </p>
+</template>
+
 <template name="tut_biased_coin">
     <p>
         In each game, you will be shown a biased coin.  It is tilted in favor of coming up either heads or tails.  Its chance of coming up heads could be anything between 1% and 99%.
@@ -34,5 +46,48 @@
         First, we will flip the coin 5 times, and all players observe the outcome of these flips.
 
         Each player will see an additional 5 coin flips.  These private flips are only seen by that player and not by anyone else.
+    </p>
+</template>
+
+<template name="tut_guess">
+    <p>
+      You will have 1 minute to submit your guess.  
+      
+      Also, players' guesses may be revealed to one another, and players may be allowed to revised their guesses after seeing other players' guesses.
+    </p>
+</template>
+
+<template name="tut_payment">
+    <!-- {{> UI.dynamic template=treatmentInst}} -->
+
+    {{> instIndiv}}
+    {{> instComp}}
+    {{> instColl}}
+</template>
+
+<template name="instIndiv">
+    <p>
+        Your bonus payment will depend on the accuracy of your guess.
+    </p>
+    <p>
+        Specifically, it will depend on the absolute difference between your guess and the number of heads in the 100 coin flips.  The smaller the difference, the higher your bonus payment.  If the difference is too large, you will receive no bonus payment.
+    </p>
+</template>
+
+<template name="instComp">
+    <p>
+        You will <b>compete</b> with the other players for a bonus payment of $1.50.
+    </p>
+    <p>
+        We will compare all players' guesses to the number of heads of the 100 coin flips.  The player who submitted the closest guess will receive the bonus payment.  If multiple guesses are closest, the players will split the bonus payment.  All other players will receive no bonus payment.
+    </p>
+</template>
+
+<template name="instColl">
+    <p>
+        Every player will be paid the same bonus payment.  This bonus payment will depend on the accuracy of the average of all players' guesses.
+    </p>
+    <p>
+        Specifically, the bonus payment will depend on the absolute difference between the average guess and the number of heads of the 100 coin flips.  The smaller the difference, the higher everyone's  bonus payment.  If the difference is too large, you will receive no bonus payment.
     </p>
 </template>

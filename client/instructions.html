@@ -1,77 +1,45 @@
 <template name="instGeneral">
-    <div class="page-header">
-        <h2>How to play</h2>
-    </div>
+	<div class="page-header">
+		<h2>Welcome to our wisdom of crowds experiment!</h2>
+	</div>
 
-    <p>In this experiment, our goal is to understand how to make use of the wisdom of the crowd to produce an accurate estimate of some quantity.</p>
+	{{> tut_overview}}
 
-    <p>Page 1: You will play 20 games.  For each game, you will be randomly matched with 4 other players and play the game with these players.</p>
-    
-    <p>Page 5: 
-      You will have 1 minute to submit your guess.  
-      
-      Also, players' guesses may be revealed to one another, and players may be allowed to revised their guesses after seeing other players' guesses.
-    </p>
-    
-    <img src="img/flip-a-coin.gif" class="img-rounded" alt="Flip a coin" width="304" height="236">
+	<img src="img/flip-a-coin.gif" class="img-rounded" alt="Flip a coin" width="304" height="236">
 </template>
 
 <template name="gameInstructions">
-    <h3>The Game</h3>
-    {{> instBrief}}
+<!-- 	<h3>The Game</h3>
+	{{> instBrief}}
 
-    {{#if delphiGame}}
-        {{> instDelphi}}
-    {{else}}
-        {{> instNoComm}}
-    {{/if}}
+	{{#if delphiGame}}
+	{{> instDelphi}}
+	{{else}}
+	{{> instNoComm}}
+	{{/if}}
 
-    <h3>Your Payment</h3>
-    {{> UI.dynamic template=treatmentInst}}
+	<h3>Your Payment</h3>
+	{{> UI.dynamic template=treatmentInst}} -->
 </template>
 
 <template name="instBrief">
-    <p>For each game, you will be randomly matched with 4 other players and play the game with these players.  The goal of all players is to guess the number of heads in 100 new flips of this coin.</p>
+	<p>For each game, you will be randomly matched with 4 other players and play the game with these players.  The goal of all players is to guess the number of heads in 100 new flips of this coin.</p>
 
-    <p>We will first flip the coin 5 times and these flips will be observed by all players.</p>
+	<p>We will first flip the coin 5 times and these flips will be observed by all players.</p>
 
-    <p>Then, for you only, we will flip the coin 5 times, and you (and no other player) will see the outcome of these 5 flips.  We will do the same for every other player.</p>
+	<p>Then, for you only, we will flip the coin 5 times, and you (and no other player) will see the outcome of these 5 flips.  We will do the same for every other player.</p>
 </template>
 
 <template name="instNoComm">
-    <p>Once every player observes the public flips and their private flips, you will have 1 minute to submit a guess of the number of heads in 100 new flips of this coin.</p>
+	<p>
+		Once all players have seen their flips, you will have 1 minute to submit a guess of the number of heads in 100 new flips of this coin.
+	</p>
 </template>
 
 <template name="instDelphi">
-    <h3>Sharing your Information</h3>
-
-    <p>Once every player observes the public flips and their private flips, you will have 30 seconds to submit a guess of the number of heads in 100 new flips of this coin.  After that, all the players' guesses will be revealed and you will have another 30 seconds to revise your guess.</p>
+	<p>
+		Once all players have seen their flips, you will have 30 seconds to submit a guess of the number of heads in 100 new flips of this coin.  After that, all the players' guesses will be revealed and you will have another 30 seconds to revise your guess.
+	</p>
 </template>
 
 
-
-<template name="instIndiv">
-  <p>Your bonus payment will depend on the accuracy of your guess.</p>
-  
-  <p>Specifically, your bonus payment will depend on the absolute difference between your guess and the number of heads in the 100 coin flips.  The smaller the difference, the higher your bonus payment.</p>
-</template>
-
-<template name="instComp">
-  <p>You will compete with the other players for a bonus payment of $1.50.</p>
-  
-  <p>
-    We will compare the players' guesses to the number of heads of the 100 coin flips.  The player who submitted the closest guess will receive the bonus payment.  If multiple players submitted the closest guess, then these players will split the bonus payment eventually.  All other players will receive no bonus payment.
-  </p>
-</template>
-
-<template name="instColl">
-    <p>
-      Every player will be paid the same bonus payment, and this bonus payment will depend on the average of all players' guesses.
-    </p>
-
-    <p>
-      Specifically, the bonus payment will roughly depend on the difference between the average guess and the number of heads of the 100 coin flips.  The larger the difference, the lower the bonus payment.</p>
-
-    <p>Specifically, we will take the difference between the average guess and the number of heads in the 100 coin flips, take the square of that quantity, and every player's bonus payment will be calculated based on this quantity.
-    </p>
-</template>
