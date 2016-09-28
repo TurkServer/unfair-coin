@@ -8,11 +8,11 @@
     </div>
 
     {{! Table of users next to number line}}
-    <div class="col-md-4">
+    <div class="col-md-4 coin-flips">
         {{> coinTable}}
     </div>
 
-    <div class="col-md-8">
+    <div class="col-md-8 flip-guesser">
         {{#if guessesReady}}
         {{> controller}}
         {{/if}}
@@ -21,6 +21,10 @@
     <div class="col-md-12">
     {{> testForm}}
     </div>
+
+    {{#if tutorialEnabled}}
+    {{> tutorial tutorialOptions}}
+    {{/if}}
 </template>
 
 <template name="coinTable">
