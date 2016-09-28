@@ -52,7 +52,7 @@ Template.displayFlips.helpers({
 const dispConf = {
   // SVG size
   width: 800,
-  height: 200,
+  height: 160,
   // How wide the number line is, left to right
   left: -300,
   right: 300,
@@ -63,10 +63,11 @@ const dispConf = {
 Template.numberLine.onCreated(function() {
   // Set guess value to 50 unless there was a previous delphi round
   const existing = Guesses.findOne({userId: Meteor.userId()});
+  const exField = this.data.existing;
 
   // Best to use integers for this RV to avoid FP math errors
-  if ( existing && existing.delphi ) {
-    this.guessValue = new ReactiveVar(Math.round(existing.delphi * 100));
+  if ( existing && existing[exField] ) {
+    this.guessValue = new ReactiveVar(Math.round(existing[exField] * 100));
   }
   else {
     // Start with no value, which doesn't show a button
@@ -74,14 +75,16 @@ Template.numberLine.onCreated(function() {
   }
 });
 
+function guessSubmitted() {
+  if( completedPhase() ) return true;
+  const g = myGuess();
+  return (delphiPhase() && g.delphi) || (finalPhase() && g.answer);
+}
+
 Template.numberLine.helpers({
   c: function(str) { return dispConf[str]; },
   middle: function() { return dispConf.width / 2; },
-  guessSubmitted: function() {
-    if( completedPhase() ) return true;
-    const g = myGuess(); 
-    return (delphiPhase() && g.delphi) || (finalPhase() && g.answer);   
-  },
+  guessSubmitted,
   guessValue: function() {
     return Template.instance().guessValue.get();
   }
@@ -96,7 +99,7 @@ const f1 = d3.format('.1f');
 
 // Draw number line for feedback using d3
 Template.numberLine.onRendered(function() {
-  const field = this.data || "answer";
+  const field = this.data && this.data.field;
   const guessValue = this.guessValue;
   
   // Config parameters
@@ -104,34 +107,23 @@ Template.numberLine.onRendered(function() {
   const height = this.$('svg').height();
   const width = this.$('svg').width();
 
-  // Grab guesses, sorting by field so arrows don't cross
-  const gs = Guesses.find({}, {sort: {[field]: 1}}).fetch();
-  const game = Games.findOne();                                        
-  console.log(gs);
-
   const x = d3.scaleLinear()
-    .clamp(true)
-    .domain([0, 1])
-    .range([ dispConf.left, dispConf.right ]);
-  
-  // Ordinal point scale
-  // https://github.com/d3/d3-scale/blob/master/README.md#scalePoint 
-  const ord = d3.scalePoint()
-    .domain( gs.map(g => g._id) )
-    .range([ dispConf.left/2, dispConf.right/2 ]);
-
-  function linPos(g) { return g[field] && x(g[field]) }
-  function ordPos(g) { return ord(g._id) }
+    .domain([0.01, 0.99]) // Don't allow guesses of 0 or 1
+    .range([ dispConf.left, dispConf.right ])
+    .clamp(true);
 
   const lineGroup = svg.select('.line-group');
   const nodeGroup = svg.select('.node-group');
 
   // Set up draggable handle for guessing phases
-  if( !completedPhase() ) {
+  if( field == null ) {
     // Position guess for delphi phase
     let existing;
+
     if ( (existing = guessValue.get()) != null ) {
       redraw( existing );
+      // Don't set up dragging if this is just a reload
+      if( guessSubmitted() ) return;
     }
 
     function onDrag() {
@@ -150,17 +142,63 @@ Template.numberLine.onRendered(function() {
       svg.select("g.draggable text").text(value);
     }
 
+    // Update value on any click or drag
+    // Note: this has to be cancelled upon submit
     const drag = d3.drag()
+      .on('start', onDrag) 
       .on('drag', onDrag);
 
     svg.call(drag);
 
     this.drag = drag;
+
+    return;
   }
-  
-  // Draw guesses on number line,
-  // unless in delphi phase, or final phase of non-delphi game
-  if( !( finalPhase() && !delphiGame() || delphiPhase() ) ) {
+
+  /*
+   * All following code only runs if field was specified: feedback mode
+   */
+
+  // Given a sorted array, push values away from the median, ensuring they
+  // are at least min away from each other.
+  // TODO: with even number of elements, push center away from each other.
+  function spaceOut(arr, min) {
+    const mid = Math.floor(arr.length / 2);
+
+    for( let i = mid + 1; i < arr.length; i++ ) {
+      const diff = arr[i] - arr[i-1];
+      if( diff > min ) continue;
+      for( let j = i; j < arr.length; j++ ) {
+        arr[j] += (min - diff);
+      }
+    }
+
+    for( let i = mid - 1; i >= 0; i-- ) {
+      const diff = arr[i+1] - arr[i];
+      if( diff > min ) continue;
+      for( let j = i; j >= 0; j-- ) {
+        arr[j] -= (min - diff);
+      }
+    }
+
+    return arr;
+  }
+
+  // Draw guesses on number line, if a field was provided
+  {
+    // Grab guesses, sorting by field so arrows don't cross
+    const gs = Guesses.find({}, {sort: {[field]: 1}}).fetch();
+
+    // Ordinal point scale
+    // https://github.com/d3/d3-scale/blob/master/README.md#scalePoint
+    const ord = d3.scaleOrdinal()
+      .domain( gs.map(g => g._id) )
+      .range( spaceOut(gs.map(linPos), 37) );
+    // Old way: space out evenly in some interval
+
+    function linPos(g) { return g[field] && x(g[field]) }
+    function ordPos(g) { return ord(g._id) }
+
     lineGroup.selectAll('.guess')
       .data(gs, g => g._id)
       .enter().append('circle')
@@ -193,6 +231,8 @@ Template.numberLine.onRendered(function() {
       .attr('x2', linPos)
       .attr('y2', 15 + dispConf.lineY - dispConf.nodeY)
   }
+
+  const game = Games.findOne();
 
   // Draw mean value in collaborative treatment
   if ( CoinFlip.isCollInc() && completedPhase() ) {
@@ -245,8 +285,8 @@ Template.numberLine.events({
       Meteor.call("updateAnswer", game._id, guess);
     }
 
-    // Cancel drag behavior.
-    t.drag.on("drag", null);
+    // Cancel drag updates
+    t.drag.on("start", null).on("drag", null);
   }
 });
 

@@ -1,5 +1,9 @@
 <template name="experiment">
     <div class="col-md-12">
+        <h1>Wagering Game</h1>
+    </div>
+
+    <div class="col-md-12">
         {{> gameInstructions}}
     </div>
 
@@ -17,8 +21,6 @@
     <div class="col-md-12">
     {{> testForm}}
     </div>
-
-
 </template>
 
 <template name="coinTable">
@@ -72,47 +74,55 @@
 </template>
 
 <template name="controller">
-    {{> prompt }}
-
-    {{#if delphiPhase}}
-    {{> numberLine }}
-    {{/if}}
-
-    {{#if finalPhase}}
-    {{> numberLine "delphi" }}
-    {{/if}}
-
-    {{#if completedPhase}}
-    {{> numberLine}}
-    {{> gameResults }}
-    {{/if}}
-</template>
-
-<template name="prompt">
     {{#if delphiPhase}}
         {{#if myGuess.delphi }}
-            <h3 class="text-warning">Waiting for others to submit their
-                initial guesses.</h3>
+            <h3>
+                <span class="text-warning">Waiting for others to submit their
+                initial guesses.</span>
+            </h3>
         {{else}}
             <h3 class="text-danger">
                 Enter an initial guess. You will then see what others think.
             </h3>
         {{/if}}
-    {{else}}
-        {{#if myGuess.answer}}
-            {{#if completedPhase}}
-                <h3>Here are the results:</h3>
+
+        {{> numberLine existing="delphi" }}
+    {{/if}}
+
+    {{#if finalPhase}}
+        {{#if delphiGame}}
+            <h3>Here's what everyone thinks so far.</h3>
+            {{> numberLine field="delphi" }}
+
+            {{#if myGuess.answer}}
+            <h3 class="text-warning">Waiting for everyone else to guess again.</h3>
             {{else}}
-                <h3 class="text-warning">Waiting for everyone else to guess.</h3>
+            <h3>You can now change your guess.</h3>
             {{/if}}
+
+            {{> numberLine existing="delphi" }}
         {{else}}
-            {{#if delphiGame}}
-                <h3>Here's what everyone thinks so far. You can now change your
-                    guess.</h3>
+            {{#if myGuess.answer}}
+            <h3 class="text-warning">
+                <span class="text-warning">
+                    Waiting for everyone else to guess.</span>
+            </h3>
             {{else}}
-                <h3>Enter your guess of the number of heads of 100 coin flips.</h3>
+            <h3>Enter your guess of the number of heads of 100 coin flips.</h3>
             {{/if}}
+            {{> numberLine existing="answer" }}
         {{/if}}
+    {{/if}}
+
+    {{#if completedPhase}}
+        {{#if delphiGame}}
+            <h3>Preliminary results:</h3>
+            {{> numberLine field="delphi" }}
+        {{/if}}
+
+        <h3>The final results:</h3>
+        {{> numberLine field="answer" }}
+        {{> gameResults }}
     {{/if}}
 </template>
 
@@ -132,19 +142,21 @@
         <g class="line-group" transform="translate({{middle}},{{c 'lineY'}})">
             <line class="number-line" x1="{{c 'left'}}" x2="{{c 'right'}}"
                   y1="0" y2="0"></line>
-            <text text-anchor="end" x="{{c 'left'}}" y="-10">
-                0 of 100</text>
-            <text text-anchor="start" x="{{c 'right'}}" y="-10">
-                100 of 100</text>
+            <text text-anchor="end" x="{{c 'left'}}" y="0">
+                0 of 100 &nbsp;</text>
+            <text text-anchor="start" x="{{c 'right'}}" y="0">
+                &nbsp; 100 of 100</text>
 
-            {{! guess values drawn here }}
-            {{#unless completedPhase}}
+            {{#unless field}}
+            {{! unless in feedback mode, don't show drag handle }}
             <g class="handle draggable">
                 <circle class="draggable" cx="0" r="11"></circle>
                 <text class="me" text-anchor="middle" font-size="20"
                       y="-20"></text>
             </g>
             {{/unless}}
+
+            {{! guess values drawn here }}
         </g>
         {{! result and payoff layout }}
         <g class="node-group" transform="translate({{middle}},{{c 'nodeY'}})">
@@ -154,8 +166,10 @@
 
     {{#unless guessSubmitted}}
     {{#with guessValue}}
-        <button class="btn btn-primary btn-lg center-block confirm-guess">
-            Confirm your guess: {{this}}</button>
+        <h3>You guess that there will be {{this}} heads in 100 flips.
+            <button class="btn btn-primary btn-lg center-block confirm-guess">
+                Confirm</button>
+        </h3>
     {{/with}}
     {{/unless}}
 </template>
