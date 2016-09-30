@@ -1,6 +1,6 @@
 <template name="experiment">
     <div class="col-md-12">
-        <h1>Wagering Game</h1>
+        <h1>Guessing Game</h1>
     </div>
 
     <div class="col-md-12">
@@ -42,7 +42,7 @@
 </template>
 
 <template name="temPrivateFlips">
-    <div class="private-flips">  
+    <div class="own-private-flips">  
         <h3><b>What only you saw:</b></h3>
         <h3 class="text-center">{{> displayFlips privateFlips}}</h3>
     </div>
@@ -100,7 +100,7 @@
             </h3>
         {{else}}
             <h3 class="text-danger">
-                Enter an initial guess. You will then see what others think.
+                Enter your initial guess. (Then you will see all other guesses.)
             </h3>
         {{/if}}
 
@@ -109,13 +109,13 @@
 
     {{#if finalPhase}}
         {{#if delphiGame}}
-            <h3>Here's what everyone thinks so far.</h3>
+            <h3>Here are all the initial guesses.</h3>
             {{> numberLine field="delphi" }}
 
             {{#if myGuess.answer}}
-            <h3 class="text-warning">Waiting for everyone else to guess again.</h3>
+                <h3 class="text-warning">Waiting for everyone else to revise their guesses.</h3>
             {{else}}
-            <h3>You can now change your guess.</h3>
+                <h3>You can change your guess if you like.</h3>
             {{/if}}
 
             {{> numberLine existing="delphi" }}
@@ -126,7 +126,7 @@
                     Waiting for everyone else to guess.</span>
             </h3>
             {{else}}
-            <h3>Enter your guess of the number of heads of 100 coin flips.</h3>
+            <h3>Enter your guess of the number of heads in 100 new coin flips.</h3>
             {{/if}}
             {{> numberLine existing="answer" }}
         {{/if}}
@@ -138,7 +138,7 @@
             {{> numberLine field="delphi" }}
         {{/if}}
 
-        <h3>The final results:</h3>
+        <h3>Final results:</h3>
         {{> numberLine field="answer" }}
         {{> gameResults }}
     {{/if}}
