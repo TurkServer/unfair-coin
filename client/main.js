@@ -42,6 +42,9 @@ Template.testForm.events({
   },
   'click .reset-payoffs': function() {
     Meteor.call("resetPayoffs");
+  },
+  'click .toggle-tutorial': function() {
+    Session.set("tutorialEnabled", !Session.get("tutorialEnabled"));
   }
 });
 

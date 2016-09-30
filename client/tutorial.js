@@ -33,7 +33,7 @@ var tutorialSteps = [
   }
 ];
 
-Session.setDefault("tutorialEnabled", true);
+Session.setDefault("tutorialEnabled", false);
 
 Template.registerHelper("tutorialOptions", {
   steps: tutorialSteps,
