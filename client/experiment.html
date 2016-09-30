@@ -9,7 +9,12 @@
 
     {{! Table of users next to number line}}
     <div class="col-md-4 coin-flips">
+        {{> temPublicFlips }}
+
+        <div class="div_private_flips">
+        {{> temPrivateFlips }}
         {{> coinTable}}
+        </div>
     </div>
 
     <div class="col-md-8 flip-guesser">
@@ -27,18 +32,36 @@
     {{/if}}
 </template>
 
-<template name="coinTable">
-    {{! Lay out all users in a simple table }}
 
-    <table class="table table-striped">
-        <thead>
+
+<template name="temPublicFlips">
+    <div class="public-flips">
+        <h3><b>What everyone saw:</b></h3>
+        <h3 class="text-center">{{> displayFlips publicFlips}}</h3>
+    </div>
+</template>
+
+<template name="temPrivateFlips">
+    <div class="private-flips">  
+        <h3><b>What only you saw:</b></h3>
+        <h3 class="text-center">{{> displayFlips privateFlips}}</h3>
+    </div>
+</template>
+
+
+<template name="coinTable">
+    {{! Show other users in a simple table }}
+
+    <h3><b>Other players</b></h3>
+    <table class="table table-striped table-player">
+<!--         <thead>
         <tr>
             <th>{{! User}}</th>
             <th>{{! Info }}</th>
             <th>Guess</th>
         </tr>
         </thead>
-        <tbody>
+ -->        <tbody>
         {{#each opponents}}
             <tr>
                 <td>
@@ -46,7 +69,7 @@
                 </td>
                 <td>(saw {{numPrivate}} flips)</td>
                 {{#if oppoGuessed}}
-                    <td class="success">Submitted!</td>
+                    <td class="success">Guess submitted!</td>
                 {{else}}
                     <td class="warning">Waiting...</td>
                 {{/if}}
@@ -54,17 +77,8 @@
         {{/each}}
         </tbody>
     </table>
-
-    {{> infoDisplay }}
 </template>
 
-<template name="infoDisplay">
-    <h3><b>What everyone saw:</b></h3>
-    <h3 class="text-center">{{> displayFlips publicFlips}}</h3>
-
-    <h3><b>What only you saw:</b></h3>
-    <h3 class="text-center">{{> displayFlips privateFlips}}</h3>
-</template>
 
 <template name="displayFlips">
     {{#each this}}

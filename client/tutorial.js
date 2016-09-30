@@ -3,7 +3,8 @@ var tutorialSteps = [
     template: Template.tut_overview
   },
   {
-    template: Template.tut_player
+    template: Template.tut_player,
+    spot: ".table-player"
   },
   {
     template: Template.tut_biased_coin
@@ -15,6 +16,14 @@ var tutorialSteps = [
   {
     template: Template.tut_info,
     spot: ".coin-flips"
+  },
+  {
+    template: Template.tut_public_flips,
+    spot: ".public-flips"
+  },
+  {
+    template: Template.tut_private_flips,
+    spot: ".div_private_flips"
   },
   {
     template: Template.tut_communication
