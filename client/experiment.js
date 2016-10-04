@@ -336,3 +336,9 @@ Template.gameResults.helpers({
     return g && f1(g.mean * 100);
   }
 });
+
+Template.gameResults.events({
+  'click #returnToLobby': _.debounce(function() {
+    Meteor.call('goToLobby');
+  }, 1000, true)
+});

@@ -1,17 +1,13 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check'
 
-// Update publications once connected to Turkserver
-Meteor.publish("Games", function() {
-  return Games.find({}, { sort: {createdAt: -1}, limit: 1});
-});
-
-Meteor.publish("Users", function() {
-  return Meteor.users.find();
-});
-
-Meteor.publish("Guesses", function(gid) {
-  return Guesses.find({gameId: gid}); 
+Meteor.publish("GameInfo", function() {
+  // These are all partitioned by game.
+  return [
+    Games.find(),
+    Meteor.users.find(),
+    Guesses.find()
+  ];
 });
 
 // Returns a random integer between min (included) and max (excluded)
@@ -44,15 +40,13 @@ function binomialFlips(n, p) {
 
 Meteor.methods({
   newGame: function (n_p, n_v, incentive, delphi){
-    // TODO - Connect with Turkserver: Once all users login move to startup.
     check(n_p, Number);
     check(n_v, Number);
 
     const p = drawProb();
 
     // Set up game with number of online users
-    const userIds =
-      Meteor.users.find({"status.online": true}).map((u) => u._id);
+    const userIds = TurkServer.Instance.currentInstance().users();     
 
     // Generate data from server side.
     const publicData = binomialFlips(n_p, p);
@@ -84,7 +78,6 @@ Meteor.methods({
     });
   },
 
-  // TODO: make this not rely solely on client-side logic
   updateDelphi: function (gameId, guess) {
     const userId = Meteor.userId();
     check(userId, String);
@@ -102,8 +95,10 @@ Meteor.methods({
       });
 
     if (update === 0) throw new Meteor.Error(400, "Already updated");
-
+    
     if ( Guesses.find({ gameId, delphi: null}).count() === 0 ) {
+      // TODO: compute mean
+      
       // Update game phase for clients to display
       Games.update(gameId, {$set: {phase: "final"}});
     }
@@ -128,12 +123,15 @@ Meteor.methods({
     if (update === 0) throw new Meteor.Error(400, "Already updated");
 
     // If all users in this game have updated, compute payoffs
-    // TODO: fix potential race conditions here
+    // TODO: fix potential race conditions here; don't run this function twice
     if ( Guesses.find({ gameId, answer: null}).count() === 0 ) {
       console.log("Computing payoffs");
       Meteor.call("computePayoffs", gameId);
 
       Games.update(gameId, {$set: {phase: "completed"}});
+      
+      // Set the end time on the instance, but users go back to lobby themselves
+      TurkServer.Instance.currentInstance().teardown(false);
     }
   },
 
@@ -204,16 +202,19 @@ Meteor.methods({
     }
   },
 
-  // Prototyping function. Resets payoffs earned so far in the game.
-  resetPayoffs: function() {
-    Meteor.users.update({}, {
-      $unset: {profit: null}
-    }, {multi: true});
+  goToLobby: function() {
+    var userId = Meteor.userId();
+    var inst = TurkServer.Instance.currentInstance();
+
+    if( inst == null ) {
+      console.log("No instance for " + userId, "; ignoring goToLobby");
+      return;
+    }
+
+    inst.sendUserToLobby(userId);
   }
 });
 
 function addPayoff(gameId, userId, payoff) {
   Guesses.update({gameId, userId}, {$set: {payoff} });
-  // For testing purposes, record cumulative payoff
-  Meteor.users.update(userId, {$inc: {profit: payoff}});
 }

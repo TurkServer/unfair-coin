@@ -5,12 +5,12 @@ import { TestingAssigner } from '/server/imports/assigner.js';
 Meteor.startup(function () {
 
   // Incentive treatments
-  TurkServer.ensureTreatmentExists({name: 'ind'});
-  TurkServer.ensureTreatmentExists({name: 'coll'});
-  TurkServer.ensureTreatmentExists({name: 'comp'});
+  TurkServer.ensureTreatmentExists({name: 'ind', incentive: 'ind'});
+  TurkServer.ensureTreatmentExists({name: 'coll', incentive: 'coll'});
+  TurkServer.ensureTreatmentExists({name: 'comp', incentive: 'comp'});
 
   // Communication treatment
-  TurkServer.ensureTreatmentExists({name: 'delphi'});
+  TurkServer.ensureTreatmentExists({name: 'delphi', delphi: true});
 
   // Set up recruiting batch
   TurkServer.ensureBatchExists({name: 'recruiting',
