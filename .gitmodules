@@ -1,0 +1,3 @@
+[submodule "packages/turkserver"]
+	path = packages/turkserver
+	url = git@github.com:TurkServer/turkserver-meteor.git

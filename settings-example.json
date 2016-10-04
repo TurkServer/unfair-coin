@@ -1,7 +1,8 @@
 {
   "public": {
     "turkserver": {
-      "dataRoute": "expAdmin"
+      "dataRoute": "expAdmin",
+      "autoLobby": false
     }
   },
   "turkserver": {
