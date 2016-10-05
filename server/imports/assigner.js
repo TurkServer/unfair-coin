@@ -23,7 +23,8 @@ class TestingAssigner extends TurkServer.Assigner {
     const userAssts = this.lobby.getAssignments();
 
     if ( userAssts.length < 2 ) {
-      throw new Meteor.Error(500, "Not enough users to start a game");
+      throw new Meteor.Error(500,
+        "Not enough users to start a game; need at least 2.");
     }
 
     this.assignToNewInstance(userAssts, treatments);

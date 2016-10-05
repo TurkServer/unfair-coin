@@ -36,7 +36,7 @@ Template.testForm.events({
     const incentive = e.target.incentive.value;
     const delphi = e.target.delphi.checked;
 
-    Meteor.call("newGame", n_p, n_v, incentive, delphi);
+    TurkServer.callWithModal("testGame", n_p, n_v, incentive, delphi);
   },
   'click .toggle-tutorial': function() {
     Session.set("tutorialEnabled", !Session.get("tutorialEnabled"));
