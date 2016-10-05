@@ -10,6 +10,18 @@ Meteor.publish("GameInfo", function() {
   ];
 });
 
+// One-way mirror publication
+Meteor.publish("AdminInfo", function(_groupId) {
+  if ( !TurkServer.isAdmin(this.userId) ) return [];
+  const users = Experiments.findOne({_id: _groupId}).users;
+  
+  return [
+    Meteor.users.find({_id: {$in: users}}),
+    Games.direct.find({_groupId}),
+    Guesses.direct.find({_groupId})
+  ];
+});
+
 // Returns a random integer between min (included) and max (excluded)
 // Using Math.round() will give you a non-uniform distribution!
 function getRandomInt(min, max) {

@@ -2,32 +2,6 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import './main.html';
 
-Template.experiment.onCreated(function () {
-
-  this.guessSubReady = new ReactiveVar(false);
-
-  // Subscribe to guesses, but stop when template is destroyed
-  this.autorun( () => {
-    // Only react to the game id changing.
-    const group = TurkServer.group();
-    if (group == null) return;
-
-    this.guessSubReady.set(false);
-    console.log("Fetching new game");
-
-    this.subscribe("GameInfo", () => {
-      this.guessSubReady.set(true);
-      console.log("Ready");
-    });
-  });
-});
-
-Template.experiment.helpers({
-  guessesReady: function() {
-    return Template.instance().guessSubReady.get();
-  }
-});
-
 Template.testForm.events({
   'submit form': function(e) {
     e.preventDefault();

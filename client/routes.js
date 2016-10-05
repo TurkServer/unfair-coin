@@ -11,9 +11,22 @@ Router.route('/lobby', function() {
 });
 
 Router.route('/experiment', {
-  action: function() {
-    this.render('experiment');
-  }
+  waitOn: function() {
+    // Group should never change here, but just in case
+    const group = TurkServer.group();
+    if (group == null) return;
+    return Meteor.subscribe("GameInfo", group);
+  },
+  template: 'experiment'
+});
+
+// One-way mirror for experiment
+Router.route('/expAdmin', {
+  path: 'exp/:groupId',
+  waitOn: function() {
+    return Meteor.subscribe("AdminInfo", this.params.groupId);
+  },
+  template: 'experiment'
 });
 
 Router.route('/survey', function() {

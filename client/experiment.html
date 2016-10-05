@@ -18,9 +18,7 @@
     </div>
 
     <div class="col-md-8 flip-guesser">
-        {{#if guessesReady}}
         {{> controller}}
-        {{/if}}
     </div>
 
     {{#if tutorialEnabled}}
@@ -61,7 +59,8 @@
         {{#each opponents}}
             <tr>
                 <td>
-                    <img src='img/ppl-{{imageHash}}.jpg' height="20"> {{oppName}}
+                    <img src='/img/ppl-{{imageHash}}.jpg' height="20">
+                    {{oppName}}
                 </td>
                 <td>(saw {{numPrivate}} flips)</td>
                 {{#if oppoGuessed}}
@@ -79,9 +78,9 @@
 <template name="displayFlips">
     {{#each this}}
         {{#if this}}
-        <img src='img/coin-head.png' height="20">
+        <img src='/img/coin-head.png' height="20">
         {{else}}
-        <img src='img/coin-tail.jpg' height="20">
+        <img src='/img/coin-tail.jpg' height="20">
         {{/if}}
     {{/each}}
     ({{heads}} heads / {{total}} flips)
