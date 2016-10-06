@@ -38,8 +38,7 @@ function drawProb() {
 
 // Flip a biased coin. Returns true with probability p.
 function flipCoin(p) {
-  if (Math.random() < p) return true;
-  return false;
+  return (Math.random() < p);
 }
 
 function binomialFlips(n, p) {
@@ -48,6 +47,34 @@ function binomialFlips(n, p) {
     result.push(flipCoin(p));
   }
   return result;
+}
+
+// Generate data for a new game. Used in tutorial and actual games.
+function generateGame(prob, publicFlips, privateFlipList,
+                      userIds, incentive, delphi) {
+
+  // The reason we might use the gameId here is to reuse scenarios
+  const gameId = Games.insert({
+    createdAt: new Date(),
+    publicData: publicFlips,
+    privateDataList: privateFlipList,
+    prob,
+    incentive,
+    delphi,
+    phase: delphi ? "delphi" : "final"
+  });
+
+  // Assign users to roles in random order
+  _.shuffle(userIds).forEach(function(userId, idx) {
+    Guesses.insert({
+      userId,
+      gameId,
+      order: idx,
+      privateData: privateFlipList[idx], //de-normalized
+      answer: null
+    });
+  });
+
 }
 
 Meteor.methods({
@@ -68,35 +95,39 @@ Meteor.methods({
     }
 
     // Store game
-    const gameId = Games.insert({
-      createdAt: new Date(),
-      publicData: publicData,
-      privateDataList: privateDataList,
-      prob: p,
-      incentive,
-      delphi,
-      phase: delphi ? "delphi" : "final"
-    });
-
-    // Assign users to roles in random order
-    _.shuffle(userIds).forEach(function(userId, idx) {
-      Guesses.insert({
-        userId,
-        gameId,
-        order: idx,
-        privateData: privateDataList[idx], //de-normalized
-        answer: null
-      });
-    });
+    generateGame(p, publicData, privateDataList, userIds, incentive, delphi);
   },
 
-  updateDelphi: function (gameId, guess) {
+  // Generate a fake game for tutorial purposes.
+  tutorialGame: function(incentive, delphi) {
+    const p = 0.75;
+
+    // The single user doing the tutorial, plus two fake bots
+    const userIds = [
+      TurkServer.Instance.currentInstance().users()[0],
+      "bot1",
+      "bot2"
+    ];
+
+    const publicFlips = [ true, true, false, false, true ];
+
+    const privateFlips = [
+      [ true, false, true, false, false ],
+      [ false, true, true, true, true ],
+      [ true, true, true, true, true ]
+    ];
+
+    generateGame(p, publicFlips, privateFlips, userIds, incentive, delphi);
+
+  },
+
+  updateDelphi: function (guess) {
     const userId = Meteor.userId();
     check(userId, String);
 
+    // Note that this is partitioned and will only update for this game
     const update = Guesses.update({
         userId: userId,
-        gameId,
         delphi: {$exists: false}
       },
       {
@@ -108,21 +139,20 @@ Meteor.methods({
 
     if (update === 0) throw new Meteor.Error(400, "Already updated");
     
-    if ( Guesses.find({ gameId, delphi: null}).count() === 0 ) {
+    if ( Guesses.find({ delphi: null }).count() === 0 ) {
       // TODO: compute mean
       
       // Update game phase for clients to display
-      Games.update(gameId, {$set: {phase: "final"}});
+      Games.update({}, {$set: {phase: "final"}});
     }
   },
   
-  updateAnswer: function (gameId, guess) {
+  updateAnswer: function (guess) {
     const userId = Meteor.userId();
     check(userId, String);
 
     const update = Guesses.update({
       userId: userId,
-      gameId,
       answer: null
     },
     {
@@ -136,24 +166,24 @@ Meteor.methods({
 
     // If all users in this game have updated, compute payoffs
     // TODO: fix potential race conditions here; don't run this function twice
-    if ( Guesses.find({ gameId, answer: null}).count() === 0 ) {
+    if ( Guesses.find({ answer: null}).count() === 0 ) {
       console.log("Computing payoffs");
-      Meteor.call("computePayoffs", gameId);
+      Meteor.call("computePayoffs");
 
-      Games.update(gameId, {$set: {phase: "completed"}});
+      Games.update({}, {$set: {phase: "completed"}});
       
       // Set the end time on the instance, but users go back to lobby themselves
       TurkServer.Instance.currentInstance().teardown(false);
     }
   },
 
-  computePayoffs: function(gameId) {
-    const game = Games.findOne(gameId);
+  computePayoffs: function() {
+    const game = Games.findOne();
     if (game == null) throw new Meteor.Error(400, "No such game");
 
     const actualProb = game.prob;
 
-    const gs = Guesses.find({gameId, answer: {$ne: null}}).fetch();
+    const gs = Guesses.find({answer: {$ne: null}}).fetch();
     if (gs.length !== game.privateDataList.length) {
       throw new Meteor.Error(400, "Wrong number of players");
     }

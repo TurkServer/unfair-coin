@@ -16,6 +16,24 @@ class TestingAssigner extends TurkServer.Assigner {
   }
 
   /**
+   * Start a fake game with just this user
+   * @param userId
+   * @param treatments
+   */
+  startTutorialGame(userId, treatments) {
+    // Get just this user's assignment
+    const assts = this.lobby.getAssignments({_id: userId});
+
+    if ( assts.length !== 1 ) {
+      throw new Meteor.Error(500, "Something's wrong.");
+    }
+
+    treatments.push('tutorial');
+
+    this.assignToNewInstance(assts, treatments);
+  }
+
+  /**
    * Try to start a new game if there are enough people
    * @param treatments
    */

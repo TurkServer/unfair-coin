@@ -16,6 +16,9 @@ Meteor.startup(function () {
   // Communication treatment
   TurkServer.ensureTreatmentExists({name: 'delphi', delphi: true});
 
+  // Tutorial game
+  TurkServer.ensureTreatmentExists({name: 'tutorial', tutorial: true});
+  
   // Set up recruiting batch
   TurkServer.ensureBatchExists({name: 'recruiting',
     active: true,
@@ -35,6 +38,13 @@ Meteor.startup(function () {
 
   // Set up testing method for starting new game
   Meteor.methods({
+    testTutorial: function (incentive, delphi) {
+      const treatments = [];
+      treatments.push(incentive);
+      if (delphi) treatments.push('delphi');
+      
+      assigner.startTutorialGame(Meteor.userId(), treatments);
+    },
     testGame: function (n_pub, n_priv, incentive, delphi) {
       // These get grabbed during the initialize function below
       n_p = n_pub;
@@ -54,10 +64,14 @@ Meteor.startup(function () {
 TurkServer.initialize(function() {
   const treatment = TurkServer.treatment();
 
-  console.log(treatment);
-
   const incentive = treatment.incentive;
   const delphi = treatment.delphi || false;
 
-  Meteor.call("newGame", n_p, n_v, incentive, delphi);
+  if( treatment.tutorial ) {
+    Meteor.call("tutorialGame", incentive, delphi);
+  }
+  else {
+    Meteor.call("newGame", n_p, n_v, incentive, delphi);
+  }
+
 });

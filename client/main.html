@@ -34,7 +34,17 @@
 <template name="testForm">
     <h3>Testing Controls</h3>
 
-    <form class="form-inline">
+    <form id="tutorial" class="form-inline">
+        Incentive: <select class="form-control" name="incentive" required>
+        <option value="ind">Individual</option>
+        <option value="coll">Collaborative</option>
+        <option value="comp">Winner-take-all</option>
+    </select>
+        Delphi: <input type="checkbox" name="delphi">
+        <button class="btn btn-success" type="submit">Start Tutorial</button>
+    </form>
+
+    <form id="startGame" class="form-inline">
         Public: <input class="form-control" name="public"
                type="number" min="1" max="20" value="5" required>
         Private: <input class="form-control" name="private"

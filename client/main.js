@@ -3,7 +3,14 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import './main.html';
 
 Template.testForm.events({
-  'submit form': function(e) {
+  'submit form#tutorial': function(e) {
+    e.preventDefault();
+    const incentive = e.target.incentive.value;
+    const delphi = e.target.delphi.checked;
+
+    TurkServer.callWithModal("testTutorial", incentive, delphi);
+  },
+  'submit form#startGame': function(e) {
     e.preventDefault();
     const n_p = parseInt(e.target.public.value);
     const n_v = parseInt(e.target.private.value);
@@ -11,9 +18,6 @@ Template.testForm.events({
     const delphi = e.target.delphi.checked;
 
     TurkServer.callWithModal("testGame", n_p, n_v, incentive, delphi);
-  },
-  'click .toggle-tutorial': function() {
-    Session.set("tutorialEnabled", !Session.get("tutorialEnabled"));
   }
 });
 

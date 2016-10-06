@@ -30,6 +30,10 @@ var tutorialSteps = [
   },
   {
     template: Template.tut_payment
+  },
+  {
+    template: Template.tut_submit_guess,
+    spot: ".flip-guesser"
   }
 ];
 
@@ -44,4 +48,11 @@ Template.registerHelper("tutorialOptions", {
 
 Template.registerHelper("tutorialEnabled", function() {
   return Session.equals("tutorialEnabled", true);
+});
+
+// Start tutorial whenever we get a treatment for it.
+Tracker.autorun(function() {
+  if( TurkServer.treatment().tutorial ) {
+    Session.set("tutorialEnabled", true);
+  }
 });

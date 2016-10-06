@@ -274,15 +274,14 @@ Template.numberLine.events({
   // TODO debounce this to avoid double events on server
   'click .confirm-guess': function(e, t) {
     e.preventDefault();
-    const game = Games.findOne();
     const guess = t.guessValue.get() / 100;
 
     // Is this a Delphi round or the final round?
     if( gamePhase() === "delphi" ) {
-      Meteor.call("updateDelphi", game._id, guess);
+      Meteor.call("updateDelphi", guess);
     }
     else {
-      Meteor.call("updateAnswer", game._id, guess);
+      Meteor.call("updateAnswer", guess);
     }
 
     // Cancel drag updates
