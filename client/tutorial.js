@@ -85,13 +85,8 @@ function getDelphiSteps() {
 }
 
 Template.registerHelper("tutorialOptions", function() {
-
-  treatment = TurkServer.treatment()
-
-  steps = getNoCommSteps();
-  if (treatment && treatment.delphi) {
-    return getDelphiSteps();
-  }
+  const steps = TurkServer.treatment().delphi ?
+    getDelphiSteps() : getNoCommSteps();
 
   return {
     steps: steps,
