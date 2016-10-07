@@ -1,18 +1,12 @@
-<template name="tut_overview">
-    <p>
-        In this experiment, our goal is to understand how to make use of the wisdom of the crowd to produce an accurate estimate of some quantity.
-    </p>
-</template>
-
 <template name="tut_player">
     <p>
-        You will play 20 betting games.  You will play each game with 4 other players randomly chosen from all participating players. 
+        You will play a series of guessing games with several other players. 
     </p>
 </template>
 
 <template name="tut_biased_coin">
     <p>
-        In each game, you will be shown flips from a biased coin, meaning the coin is tilted in favor of coming up either heads or tails.  Its chance of coming up heads could be anything between 1% and 99%.
+        In each game, you are given a biased coin, which is tilted in favor of coming up either heads or tails.  Its chance of coming up heads could be anything between 1% and 99%.
     </p>
     
     <p>
@@ -23,7 +17,13 @@
 
 <template name="tut_goal">
     <p>
-        Your goal is to guess the number of heads in 100 new flips of the coin.  You will earn a bonus payment based on the accuracy of your guess and possibly other players' guesses.
+        Your <b>goal</b> is to <b>guess the number of heads in 100 new flips of the biased coin</b>.  
+
+        {{#if isInd}}
+            You will earn a bonus payment based on the accuracy of your guess.
+        {{else}}
+            You will earn a bonus payment based on the accuracy of your guess and other players' guesses.
+        {{/if}}
     </p>  
 
 </template>
@@ -31,7 +31,8 @@
 <template name="tut_info">
     <p>
         To help you make an accurate guess, you will see some coin flips.
-
+    </p>
+    <p>
         Some flips are observed by all players, whereas other flips are only observed by a particular player.
     </p>
 
@@ -39,7 +40,10 @@
 
 <template name="tut_public_flips">
     <p>
-        We will flip the coin 5 times, and all players will see the outcome of these flips. 
+        First, we will flip the coin 5 times, and all players will see the outcome of these 5 flips. 
+    </p>
+    <p>
+        Take a look at the outcome of these flips on the left.
     </p>
 </template>
 
@@ -48,79 +52,174 @@
         Each player will see an additional 5 coin flips.  These private flips are only seen by that player and not by anyone else.
     </p>
     <p>
-      You can see the outcome of your 5 flips.  
+      Take a look at the outcome of your 5 flips on the left.  
 
-      In the table, you can also see that every other player saw 5 flips without knowing the outcome of these flips. 
+      In the table below, you are also reminded that every other player saw 5 flips but you cannot see the outcome of these flips.  
     </p>
 </template>
 
-<template name="tut_communication">
-
-    {{> instNoComm}}
-    {{> instDelphi}}
-</template>
-
-
-<template name="instNoComm">
-    <h2>No communication</h2>
-    <p>
-        You will have 1 minute to submit your guess.
+<template name="instNoComm_make_guess">
+    <p> 
+        When the game starts, you have 1 minute to make a guess.  
     </p>
     <p>
-        Once all players have submitted their guesses, the game ends and we will show you all guesses and your bonus payment.
+        Please make a guess now by clicking anywhere on the number line or moving the red dot.
     </p>
 </template>
+
+<template name="instNoComm_confirm_guess">
+    <p>
+        Once you are happy with your guess, you can confirm it by clicking on the "Confirm" button.  After confirming your guess, you won't be able to change it anymore.
+    </p>
+    <p>
+        Please confirm your guess once you are happy with it.
+    </p>
+</template>
+
+<template name="instNoComm_wait_other_guesses">
+    <p>
+        After confirming your guess, you may have to wait for other players to confirm their guesses.  
+    </p>
+</template>
+
+<template name="instNoComm_game_end">
+    <p>
+        Once all players have confirmed their guesses, the game ends.
+    </p>
+    <p>
+        We will show you all players' guesses and your bonus payment.
+    </p>    
+</template>
+
+
+
+
+
 
 <template name="instDelphi">
     <h2>Delphi</h2>
     <p>
-        The game will proceed in 2 rounds.
+        You will have 2 chances to revise your guess.  
     </p>
     <p>
-        In round 1, you will have 30 seconds to submit your guess.  Once all players have submitted their guesses, round 1 ends and we will reveal all guesses.  
-    </p>  
+        You will have 30 seconds to make an initial guess and confirm it.  
+    </p>
     <p>
-        In round 2, you will have another 30 seconds to revise and submit your final guess.  Once all players have submitted their final guesses, the game ends and we will show you all final guesses and your bonus payment.
+        Once all players have confirmed their initial guesses, we will reveal all initial guesses.
+    </p>
+    <p>
+        Then you will have another 30 seconds to revise your guess and confirm your final guess. 
+    </p>
+    <p> 
+        Once all players have submitted their final guesses, the game ends and we will show you all final guesses and your bonus payment.
     </p>
 </template>
 
+<template name="instDelphi_make_initial_guess">
+    <p>
+        At the start of the game, you will have 30 seconds to make an initial guess.  
+    </p>
+    <p>
+        Please make a guess now by clicking anywhere on the number line or moving the red dot.
+    </p>
+</template>
+
+<template name="instDelphi_confirm_initial_guess">
+    <p>
+        Once you are happy with your initial guess, you can submit it by clicking on the "Confirm" button.  
+    </p>
+    <p>
+        Please submit your initial guess once you are happy with it.
+    </p>
+</template>
+
+<template name="instDelphi_wait_other_initial_guesses">
+    <p>
+        After submitting your initial guess, you may have to wait for other players to submit their initial guesses.
+    </p>
+</template>
+
+<template name="instDelphi_reveal_guess">
+    <p>
+        Once all players submitted their initial guesses, we will reveal all guesses to everyone. 
+    </p>
+    {{!Customize this message for different incentives}}
+
+</template>
+
+<template name="instDelphi_revise_guess">
+    <p>
+        Once all initial guesses are revealed, all players will have 30 seconds to revise their guesses.  
+    </p>
+    <p>
+        If you like, please revise your guess on the number line at the bottom. 
+    </p>
+</template>
+
+<template name="instDelphi_confirm_final_guess">
+    <p>
+        Once you are happy with your guess, you can confirm it by clicking on the "Confirm" button.  After confirming your guess, you won't be able to change it anymore.
+    </p>
+    <p>
+        Please confirm your guess once you are happy with it.
+    </p>
+</template>
+
+<template name="instDelphi_wait_other_final_guesses">
+    <p>
+        After confirming your final guess, you may have to wait for other players to confirm their final guesses.
+    </p>
+</template>
+
+<template name="instDelphi_game_end">
+    <p>
+        Once all players have confirmed their final guesses, the game ends.
+    </p>
+    <p>
+        We will show you all players' initial and final guesses and your bonus payment.
+    </p>    
+</template>
 
 
 <template name="tut_payment">
-    <!-- {{> UI.dynamic template=treatmentInst}} -->
 
-    {{> instIndiv}}
-    {{> instComp}}
-    {{> instColl}}
+    {{# if isInd}}
+        {{> instIndiv}}
+    {{/if}}
+
+    {{# if isComp}}
+        {{> instComp}}
+    {{/if}}
+
+    {{# if isColl}}
+        {{> instColl}}
+    {{/if }}
 </template>
 
 <template name="instIndiv">
-    <h2>Individual Incentive</h2>
     <p>
-        Your bonus payment will depend on the accuracy of your guess.
+        Your bonus payment will depend on the accuracy of your guess.  The more accurate your guess is, the higher your bonus payment.  
     </p>
     <p>
-        Specifically, it will depend on the absolute difference between your guess and the number of heads in the 100 coin flips.  The smaller the difference, the higher your bonus payment.  If the difference is too large, you will receive no bonus payment.
-    </p>
-</template>
-
-<template name="instComp">
-    <h2>Competitive Incentive</h2>
-    <p>
-        You will <b>compete</b> with the other players for a bonus payment of $1.50.
-    </p>
-    <p>
-        We will compare all players' guesses to the number of heads of the 100 coin flips.  The player who submitted the closest guess will receive the bonus payment.  If multiple guesses are closest, the players will split the bonus payment.  All other players will receive no bonus payment.
+        Specifically, your bonus payment will depend on the absolute difference between your guess and the number of heads in the 100 coin flips.  If the difference is too large, you will receive no bonus payment.
     </p>
 </template>
 
 <template name="instColl">
-    <h2>Collaborative Incentive</h2>
     <p>
-        Every player will be paid the same bonus payment.  This bonus payment will depend on the accuracy of the average of all players' guesses.
+        Every player will be paid the same bonus payment.  This bonus payment will depend on the accuracy of the <b>average</b> of all players' guesses.  The more accurate the average guess, the higher everyone's bonus payment.
     </p>
     <p>
-        Specifically, the bonus payment will depend on the absolute difference between the average guess and the number of heads of the 100 coin flips.  The smaller the difference, the higher everyone's  bonus payment.  If the difference is too large, you will receive no bonus payment.
+        Specifically, the bonus payment will depend on the absolute difference between the average guess and the number of heads of the 100 coin flips.  If the difference is too large, no one will receive any bonus payment.
+    </p>
+</template>
+
+<template name="instComp">
+    <p>
+        You will <b>compete</b> with the other players for a bonus payment of $1.50.  
+    </p>
+    <p>
+        The player who submitted the closest guess will receive the bonus payment.  In the event of a tie, all players who submitted the closest guesses will split the bonus payment.  All other players will receive no bonus payment.
     </p>
 </template>
 

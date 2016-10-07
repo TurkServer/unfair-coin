@@ -1,5 +1,5 @@
 <template name="experiment">
-    <div class="col-md-12">
+    <div class="col-md-12 game_title">
         <h1>Guessing Game</h1>
     </div>
 
@@ -76,14 +76,15 @@
 
 
 <template name="displayFlips">
-    {{#each this}}
+<!--     {{#each this}}
         {{#if this}}
         <img src='/img/coin-head.png' height="20">
         {{else}}
         <img src='/img/coin-tail.jpg' height="20">
         {{/if}}
     {{/each}}
-    ({{heads}} heads / {{total}} flips)
+ -->    
+    {{heads}} heads / {{total}} flips
 </template>
 
 <template name="controller">
@@ -104,26 +105,36 @@
 
     {{#if finalPhase}}
         {{#if delphiGame}}
+            
             <h3>Here are all the initial guesses.</h3>
+            
             {{> numberLine field="delphi" }}
 
             {{#if myGuess.answer}}
-                <h3 class="text-warning">Waiting for everyone else to revise their guesses.</h3>
+                <h3 class="text-warning">Waiting for others to revise their guesses.</h3>
             {{else}}
                 <h3>You can change your guess if you like.</h3>
             {{/if}}
 
             {{> numberLine existing="delphi" }}
+
         {{else}}
+
+            <div class="guess_no_comm">
+
             {{#if myGuess.answer}}
-            <h3 class="text-warning">
-                <span class="text-warning">
-                    Waiting for everyone else to guess.</span>
-            </h3>
+                <h3 class="text-warning">
+                    <span class="text-warning">
+                        Waiting for others to submit their guesses.
+                    </span>
+                </h3>
             {{else}}
-            <h3>Enter your guess of the number of heads in 100 new coin flips.</h3>
+                <h3>Enter your guess of the number of heads in 100 new coin flips.</h3>
             {{/if}}
+
             {{> numberLine existing="answer" }}
+            
+            </div>
         {{/if}}
     {{/if}}
 
@@ -135,6 +146,7 @@
 
         <h3>Final results:</h3>
         {{> numberLine field="answer" }}
+
         {{> gameResults }}
     {{/if}}
 </template>
@@ -179,7 +191,7 @@
 
     {{#unless guessSubmitted}}
     {{#with guessValue}}
-        <h3>You guess that there will be {{this}} heads in 100 flips.
+        <h3>You guessed that there will be {{this}} heads in 100 flips.
             <button class="btn btn-primary btn-lg center-block confirm-guess">
                 Confirm</button>
         </h3>
@@ -191,16 +203,16 @@
 <template name="gameResults">
     {{! Show ground truth }}
     <h3 class="text-center">
-        On average, this coin comes up heads
-        <b class="text-success">{{prob}}</b> times in 100 flips.</h3>
+        This coin came up heads
+        <b class="text-success">{{prob}}</b> times in 100 new flips.</h3>
 
     {{! Show guess }}
     <h3 class="text-center">
         {{#if isCollInc}}
             Your group guessed an average of
-            <b class="text-warning">{{ avgGuess }}</b>.
+            <b class="text-warning">{{ avgGuess }}</b> heads in 100 new flips.
         {{else}}
-            You guessed <b class="text-info">{{ myAnswer }}</b>.
+            You guessed <b class="text-info">{{ myAnswer }}</b> heads in 100 new flips.
         {{/if}}
     </h3>
 
@@ -209,14 +221,13 @@
       {{# if isCompInc}}
         {{# if myWinStatus }}
           {{! TODO better message for ties }}
-            You are one of the closest players to the actual value.
-            You earned a bonus of <b>{{ myPayoff }}</b>.
+            Congratulations! You earned a bonus of <b>{{ myPayoff }}</b>. Your guess was one of the closest to the actual value.
         {{else}}
-          You did not earn anything since you did not have the closest guess.
+          Sorry!  You did not earn anything since your guess was not one of the closest. 
         {{/if}}
       {{else}}
           {{#if isCollInc}}
-              You and everyone in your group earned a bonus of
+              You and every other player earned a bonus of 
               <b>{{ myPayoff }}</b>.
           {{else}}
               You earned a bonus of <b>{{ myPayoff }}</b>.
