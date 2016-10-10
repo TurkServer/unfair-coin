@@ -1,3 +1,5 @@
+import { myGuess } from '/client/imports/common.js'
+
 var tutorialStepsIntro = [
   {
     template: Template.tut_player,
@@ -20,18 +22,46 @@ var tutorialStepsIntro = [
   },
   {
     template: Template.tut_private_flips,
-    spot: ".div_private_flips"
+    // Note that this expands the spotlight to show both elements
+    spot: ".own-private-flips, .table-player"
   }
 ];
+
+function delphiSubmitted() {
+  const g = myGuess();
+  return g && g.delphi != null;
+}
+
+function answerSubmitted() {
+  const g = myGuess();
+  return g && g.answer != null;
+}
+
+function ensureBotsDelphi() {
+  // Ensure that delphi guesses are submitted by the bots
+  // This check prevents unnecessary hits to the server
+  if( Guesses.findOne({delphi: null}) != null ) {
+    Meteor.call("tutBotsDelphi");
+  }
+}
+
+function ensureBotsAnswer() {
+  // Ensure that delphi guesses are submitted by the bots
+  // This check prevents unnecessary hits to the server
+  if( Guesses.findOne({answer: null}) != null ) {
+    Meteor.call("tutBotsAnswer");
+  }
+}
 
 var tutorialStepsGameNoComm = [
   {
     template: Template.instNoComm_make_guess,
     spot: ".flip-guesser"
   },
-    {
+  {
     template: Template.instNoComm_confirm_guess,
-    spot: ".flip-guesser"
+    spot: ".flip-guesser",
+    require: answerSubmitted
   },
   {
     template: Template.instNoComm_wait_other_guesses,
@@ -39,36 +69,49 @@ var tutorialStepsGameNoComm = [
   },
   {
     template: Template.instNoComm_game_end,
-    spot: ".flip-guesser"
+    spot: ".flip-guesser",
+    onLoad: ensureBotsAnswer
   }
 ];
 
 var tutorialStepsGameDelphi = [
   {
-    template: Template.instDelphi_make_initial_guess
+    template: Template.instDelphi_make_initial_guess,
+    spot: ".flip-guesser"
   },
   {
-    template: Template.instDelphi_confirm_initial_guess
+    template: Template.instDelphi_confirm_initial_guess,
+    spot: ".flip-guesser",
+    require: delphiSubmitted
   },
   {
-    template: Template.instDelphi_wait_other_initial_guesses
+    template: Template.instDelphi_wait_other_initial_guesses,
+    spot: ".flip-guesser"
   },
   {
-    template: Template.instDelphi_reveal_guess
+    template: Template.instDelphi_reveal_guess,
+    spot: ".flip-guesser",
+    onLoad: ensureBotsDelphi
   },
   {
-    template: Template.instDelphi_revise_guess
+    template: Template.instDelphi_revise_guess,
+    spot: ".flip-guesser"
   },
   {
-    template: Template.instDelphi_confirm_final_guess
+    template: Template.instDelphi_confirm_final_guess,
+    spot: ".flip-guesser",
+    require: answerSubmitted
   },
   {
-    template: Template.instDelphi_wait_other_final_guesses
+    template: Template.instDelphi_wait_other_final_guesses,
+    spot: ".flip-guesser"
   },
   {
-    template: Template.instDelphi_game_end
+    template: Template.instDelphi_game_end,
+    spot: ".flip-guesser",
+    onLoad: ensureBotsAnswer
   }
-]
+];
 
 var tutorialStepsBonus = [
   {

@@ -120,6 +120,55 @@ Meteor.methods({
     generateGame(p, publicFlips, privateFlips, userIds, incentive, delphi);
 
   },
+  // Submit fake guesses for the bots
+  tutBotsDelphi: function () {
+    const userId = Meteor.userId();
+    check(userId, String);
+    
+    const game = Games.findOne();
+    if( game.phase !== "delphi" ) return;
+    
+    Guesses.find({
+      userId: {$ne: userId}, 
+      delphi: null
+    }).forEach(function(g) {
+      const total = _.countBy(game.publicData).true 
+        + _.countBy(g.privateData).true;
+      
+      Guesses.update(g._id, {
+        $set: {
+          delphi: (total + getRandomInt(0, 11)) / 20.0
+        }
+      });
+    });
+
+    Games.update({}, {$set: {phase: "final"}});
+  },
+  tutBotsAnswer: function () {
+    const userId = Meteor.userId();
+    check(userId, String);
+
+    const game = Games.findOne();
+    if( game.phase !== "final" ) return;
+
+    Guesses.find({
+      userId: {$ne: userId},
+      answer: null
+    }).forEach(function(g) {
+      const total = _.countBy(game.publicData).true
+        + _.countBy(g.privateData).true;
+
+      Guesses.update(g._id, {
+        $set: {
+          answer: (total * 8 + getRandomInt(0, 21)) / 100.0
+        }
+      });
+    });
+
+    // TODO potential race conditions here too
+    Meteor.call("computePayoffs");
+    Games.update({}, {$set: {phase: "completed"}});
+  },
 
   updateDelphi: function (guess) {
     const userId = Meteor.userId();
@@ -259,4 +308,6 @@ Meteor.methods({
 
 function addPayoff(gameId, userId, payoff) {
   Guesses.update({gameId, userId}, {$set: {payoff} });
+  
+  // TODO record payoffs elsewhere, unless game is a tutorial
 }

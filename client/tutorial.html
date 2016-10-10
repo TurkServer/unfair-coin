@@ -1,6 +1,7 @@
 <template name="tut_player">
     <p>
-        You will play a series of guessing games with several other players. 
+        In this HIT, you will play a series of guessing games with several
+        other players.
     </p>
 </template>
 
@@ -67,12 +68,17 @@
     </p>
 </template>
 
+<!-- Alice: you can reuse this template below -->
 <template name="instNoComm_confirm_guess">
     <p>
         Once you are happy with your guess, you can confirm it by clicking on the "Confirm" button.  After confirming your guess, you won't be able to change it anymore.
     </p>
     <p>
-        Please confirm your guess once you are happy with it.
+    {{#if stepCompleted}}
+        <b class="text-success">Continue to the next step.</b>
+    {{else}}
+        <b class="text-danger">Please confirm your guess once you are happy with it.</b>
+    {{/if}}
     </p>
 </template>
 
@@ -122,6 +128,7 @@
     <p>
         Please make a guess now by clicking anywhere on the number line or moving the red dot.
     </p>
+
 </template>
 
 <template name="instDelphi_confirm_initial_guess">
@@ -129,7 +136,11 @@
         Once you are happy with your initial guess, you can submit it by clicking on the "Confirm" button.  
     </p>
     <p>
-        Please submit your initial guess once you are happy with it.
+    {{#if stepCompleted}}
+        <b class="text-success">Continue to the next step.</b>
+    {{else}}
+        <b class="text-danger">Submit your initial guess once you are happy with it.</b>
+    {{/if}}
     </p>
 </template>
 
@@ -161,7 +172,11 @@
         Once you are happy with your guess, you can confirm it by clicking on the "Confirm" button.  After confirming your guess, you won't be able to change it anymore.
     </p>
     <p>
-        Please confirm your guess once you are happy with it.
+    {{#if stepCompleted}}
+        <b class="text-success">Continue to the next step.</b>
+    {{else}}
+        <b class="text-danger">Please confirm your guess once you are happy with it.</b>
+    {{/if}}
     </p>
 </template>
 

@@ -1,42 +1,13 @@
 // https://forums.meteor.com/t/immutable-bindings-of-es6-modules/25118/5
 // Otherwise d3.event is not usable.
 const d3 = require('d3');
-
-function delphiGame() {
-  const game = Games.findOne();
-  return game && game.delphi;
-}
-Template.registerHelper('delphiGame', delphiGame);
-
-function gamePhase() {
-  const game = Games.findOne({}, {field: {phase: 1}});
-  return game && game.phase;
-}
-
-/**
- * Whether the current game is a delphi game and in the delphi phase.
- * @returns {boolean}
- */
-function delphiPhase() {
-  // Although we can compute this by looking at whether the game is delphi and some guesses are incomplete, it's easier to let the server handle it
-  return gamePhase() === "delphi";
-}
-Template.registerHelper('delphiPhase', delphiPhase);
-
-function finalPhase() {
-  return gamePhase() === "final";
-}
-Template.registerHelper('finalPhase', finalPhase);
-
-function completedPhase() {
-  return gamePhase() === "completed";
-}
-Template.registerHelper('completedPhase', completedPhase);
-
-function myGuess() {
-  return Guesses.findOne({userId: Meteor.userId()});
-}
-Template.registerHelper('myGuess', myGuess);
+import { 
+  delphiGame,
+  gamePhase, 
+  guessSubmitted,
+  completedPhase,
+  myGuess
+} from '/client/imports/common.js';
 
 Template.displayFlips.helpers({
   heads: function() {
@@ -74,12 +45,6 @@ Template.numberLine.onCreated(function() {
     this.guessValue = new ReactiveVar();
   }
 });
-
-function guessSubmitted() {
-  if( completedPhase() ) return true;
-  const g = myGuess();
-  return (delphiPhase() && g.delphi) || (finalPhase() && g.answer);
-}
 
 Template.numberLine.helpers({
   c: function(str) { return dispConf[str]; },
@@ -216,7 +181,7 @@ Template.numberLine.onRendered(function() {
       .attr('font-size', 30)
       .attr('x', ordPos)
       .attr('y', 0)
-      .text(g => g[field] && f0(g[field] * 100))
+      .text(g => g[field] && f0(g[field] * 100));
 
     // Draw arrows to number line values
     nodeGroup.selectAll('line')
