@@ -165,9 +165,10 @@ Meteor.methods({
       });
     });
 
-    // TODO potential race conditions here too
+    // TODO potential race conditions here too, or at least ensure client is debounced
     Meteor.call("computePayoffs");
     Games.update({}, {$set: {phase: "completed"}});
+    TurkServer.Instance.currentInstance().teardown(false);
   },
 
   updateDelphi: function (guess) {
