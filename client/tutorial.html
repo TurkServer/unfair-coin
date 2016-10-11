@@ -43,7 +43,7 @@
     <p>
         First, we will flip the coin 5 times, and all players will see the outcome of these 5 flips. 
     </p>
-    <p>
+    <p class="text-warning">
         Take a look at the outcome of these flips on the left.
     </p>
 </template>
@@ -52,7 +52,7 @@
     <p>
         Each player will see an additional 5 coin flips.  These private flips are only seen by that player and not by anyone else.
     </p>
-    <p>
+    <p class="text-warning">
       Take a look at the outcome of your 5 flips on the left.  
 
       In the table below, you are also reminded that every other player saw 5 flips but you cannot see the outcome of these flips.  
@@ -63,37 +63,35 @@
     <p> 
         When the game starts, you have 1 minute to make a guess.  
     </p>
-    <p>
+    <b class="text-danger">
         Please make a guess now by clicking anywhere on the number line or moving the red dot.
-    </p>
+    </b>
 </template>
 
 <!-- Alice: you can reuse this template below -->
 <template name="instNoComm_confirm_guess">
     <p>
-        Once you are happy with your guess, you can confirm it by clicking on the "Confirm" button.  After confirming your guess, you won't be able to change it anymore.
+        Once you are happy with your guess, you can confirm it by clicking on the "Confirm" button.  
+    </p>
+    <p>
+        After confirming your guess, you won't be able to change it anymore.  Also you may have to wait for other players to confirm their guesses.
     </p>
     <p>
     {{#if stepCompleted}}
         <b class="text-success">Continue to the next step.</b>
     {{else}}
-        <b class="text-danger">Please confirm your guess once you are happy with it.</b>
+        <b class="text-danger">Please revise your guess if you like and confirm it once you are happy with it.</b>
     {{/if}}
     </p>
 </template>
 
-<template name="instNoComm_wait_other_guesses">
-    <p>
-        After confirming your guess, you may have to wait for other players to confirm their guesses.  
-    </p>
-</template>
 
 <template name="instNoComm_game_end">
     <p>
         Once all players have confirmed their guesses, the game ends.
     </p>
     <p>
-        We will show you all players' guesses and your bonus payment.
+        We will show you all players' guesses, the actual number of heads in the 100 new coin flips and your bonus payment.
     </p>    
 </template>
 
@@ -102,31 +100,16 @@
 
 
 
-<template name="instDelphi">
-    <h2>Delphi</h2>
-    <p>
-        You will have 2 chances to revise your guess.  
-    </p>
-    <p>
-        You will have 30 seconds to make an initial guess and confirm it.  
-    </p>
-    <p>
-        Once all players have confirmed their initial guesses, we will reveal all initial guesses.
-    </p>
-    <p>
-        Then you will have another 30 seconds to revise your guess and confirm your final guess. 
-    </p>
-    <p> 
-        Once all players have submitted their final guesses, the game ends and we will show you all final guesses and your bonus payment.
-    </p>
-</template>
+
 
 <template name="instDelphi_make_initial_guess">
     <p>
         At the start of the game, you will have 30 seconds to make an initial guess.  
     </p>
     <p>
+    <b class="text-danger">
         Please make a guess now by clicking anywhere on the number line or moving the red dot.
+        </b>
     </p>
 
 </template>
@@ -163,7 +146,9 @@
         Once all initial guesses are revealed, all players will have 30 seconds to revise their guesses.  
     </p>
     <p>
+    <b class="text-danger">
         If you like, please revise your guess on the number line at the bottom. 
+    </b>
     </p>
 </template>
 

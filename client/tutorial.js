@@ -64,10 +64,6 @@ var tutorialStepsGameNoComm = [
     require: answerSubmitted
   },
   {
-    template: Template.instNoComm_wait_other_guesses,
-    spot: ".flip-guesser"
-  },
-  {
     template: Template.instNoComm_game_end,
     spot: ".flip-guesser",
     onLoad: ensureBotsAnswer
@@ -83,10 +79,6 @@ var tutorialStepsGameDelphi = [
     template: Template.instDelphi_confirm_initial_guess,
     spot: ".flip-guesser",
     require: delphiSubmitted
-  },
-  {
-    template: Template.instDelphi_wait_other_initial_guesses,
-    spot: ".flip-guesser"
   },
   {
     template: Template.instDelphi_reveal_guess,
@@ -115,16 +107,21 @@ var tutorialStepsGameDelphi = [
 
 var tutorialStepsBonus = [
   {
-    template: Template.tut_payment
+    template: Template.tut_payment,
+    spot: ".bonus_info"
   }
 ];
 
 function getNoCommSteps() {
-  return tutorialStepsIntro.concat(tutorialStepsGameNoComm, tutorialStepsBonus);
+  var steps = tutorialStepsIntro.concat(tutorialStepsGameNoComm);
+  steps = steps.concat(tutorialStepsBonus);
+  return steps;
 }
 
 function getDelphiSteps() {
-  return tutorialStepsIntro.concat(tutorialStepsGameDelphi, tutorialStepsBonus);
+  var steps = tutorialStepsIntro.concat(tutorialStepsGameDelphi);
+  steps = steps.concat(tutorialStepsBonus);
+  return steps;
 }
 
 Template.registerHelper("tutorialOptions", function() {
