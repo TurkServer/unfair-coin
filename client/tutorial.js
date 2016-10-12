@@ -5,7 +5,8 @@ var tutorialStepsIntro = [
     template: Template.tut_player
   },
   {
-    template: Template.tut_biased_coin
+    template: Template.tut_biased_coin,
+    require: questionBiasedCoinAnswered
   },
   {
     template: Template.tut_goal,
@@ -21,6 +22,22 @@ var tutorialStepsIntro = [
     spot: ".own-private-flips, .table-player"
   }
 ];
+
+Session.setDefault("qBiasedCoin", false);
+
+Template.tut_biased_coin.events({
+  'submit form#form_question_biased_coin': function(e) {
+    e.preventDefault();
+    if (e.target.optradio.value === "between_30_50") {
+      Session.set("qBiasedCoin", true);
+    }
+  }
+});
+
+
+function questionBiasedCoinAnswered() {
+  return Session.equals("qBiasedCoin", true);
+}
 
 function delphiSubmitted() {
   const g = myGuess();

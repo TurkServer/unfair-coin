@@ -16,25 +16,45 @@
         For example, if the coin has a 30% chance of coming up heads, then roughly, you expect to see 30 heads in 100 new flips of the coin.
     </p>
 
-    <p> 
+    <form id="form_question_biased_coin"> 
         Suppose that a coin has 40% chance of coming up heads.  If you flip the coin 100 times, which statement is true?
 
         <div class="radio">
-          <label><input type="radio" name="optradio">I will definitely see exactly 40 heads.</label>
+          <label>
+          <input type="radio" name="optradio" value="def_40">
+          I will definitely see exactly 40 heads.
+          </label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">It is impossible to get fewer than 10 heads.</label>
+          <label>
+          <input type="radio" name="optradio" value="no_less_10">
+          It is impossible to get fewer than 10 heads.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">It is possible to see any number of heads, but the chances are good that I will get between 30 and 50 heads.</label>
+          <label>
+          <input type="radio" name="optradio" value="between_30_50">
+          It is possible to see any number of heads, but the chances are good that I will get between 30 and 50 heads.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">There is a 50% chance that the coin will come up tails.</label>
+          <label>
+          <input type="radio" name="optradio" value="tail_50">
+          There is a 50% chance that the coin will come up tails.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">The chances of getting 80 heads is exactly the same as the chance of getting 15 heads.</label>
+          <label>
+          <input type="radio" name="optradio" value="equal_80_15">
+          The chances of getting 80 heads is exactly the same as the chance of getting 15 heads.</label>
         </div>
 
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+
+    <p>
+    {{#if stepCompleted}}
+        <b class="text-success">Continue to the next step.</b>
+    {{else}}
+        <b class="text-danger">Please answer the question.</b>
+    {{/if}}
     </p>
 
 </template>
