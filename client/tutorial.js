@@ -48,8 +48,6 @@ function ensureBotsAnswer() {
   }
 }
 
-
-
 var tutorialStepsGameNoComm = [
   {
     template: Template.instNoComm_make_guess,

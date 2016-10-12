@@ -118,8 +118,6 @@
 
         {{else}}
 
-            <div class="guess_no_comm">
-
             {{#if myGuess.answer}}
                 <h3 class="text-warning">
                     <span class="text-warning">
@@ -131,8 +129,7 @@
             {{/if}}
 
             {{> numberLine existing="answer" }}
-            
-            </div>
+
         {{/if}}
     {{/if}}
 
@@ -189,10 +186,12 @@
 
     {{#unless guessSubmitted}}
     {{#with guessValue}}
+        <div class="guess-confirm">
         <h3>You guessed that there will be {{this}} heads in 100 flips.
-            <button class="btn btn-primary btn-lg center-block confirm-guess">
+            <button class="btn btn-primary btn-lg confirm-guess">
                 Confirm</button>
         </h3>
+        </div>
     {{/with}}
     {{/unless}}
 </template>

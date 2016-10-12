@@ -23,4 +23,25 @@ svg {
     stroke: #31708f;
     fill: #31708f;
   }
+
+}
+
+.flip-guesser {
+  position: relative;
+}
+
+.guess-confirm {
+  position: absolute;
+  // http://stackoverflow.com/questions/8508275/how-to-center-a-position-absolute-element
+  margin-left: auto;
+  margin-right: auto;
+  bottom: 0;
+
+  h3 {
+    display: inline-block;
+  }
+
+  button {
+    display: inline-block;
+  }
 }

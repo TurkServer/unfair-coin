@@ -22,11 +22,11 @@ Template.displayFlips.helpers({
 
 const dispConf = {
   // SVG size
-  width: 800,
+  width: 730,
   height: 160,
   // How wide the number line is, left to right
-  left: -300,
-  right: 300,
+  left: -280,
+  right: 280,
   lineY: 50, // vert pos of the number line
   nodeY: 150, // vert pos of text
 };
