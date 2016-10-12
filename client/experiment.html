@@ -47,14 +47,18 @@
 
     <h3><b>Other players</b></h3>
     <table class="table table-striped table-player">
-<!--         <thead>
+        <thead>
         <tr>
             <th>{{! User}}</th>
             <th>{{! Info }}</th>
-            <th>Guess</th>
+            {{!--
+                This looks somewhat strange, but it properly shows                         1 column in normal and 2 in delphi mode.
+            --}}
+            <th>{{#if delphiGame}}1<sup>st</sup> Guess{{/if}}</th>
+            {{#if delphiGame}}<th>2<sup>nd</sup> Guess</th>{{/if}}
         </tr>
         </thead>
- -->        <tbody>
+        <tbody>
         {{#each opponents}}
             <tr>
                 <td>
@@ -62,8 +66,17 @@
                     {{oppName}}
                 </td>
                 <td>(saw {{numPrivate}} flips)</td>
-                {{#if oppoGuessed}}
-                    <td class="success">Guess submitted!</td>
+
+                {{#if delphiGame}}
+                {{#if delphiGuessed}}
+                    <td class="success">Guessed!</td>
+                {{else}}
+                    <td class="warning">Waiting...</td>
+                {{/if}}
+                {{/if}}
+
+                {{#if answerGuessed}}
+                    <td class="success">Guessed!</td>
                 {{else}}
                     <td class="warning">Waiting...</td>
                 {{/if}}

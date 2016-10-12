@@ -149,11 +149,11 @@ Template.numberLine.onRendered(function() {
     return arr;
   }
 
+  // Grab guesses, sorting by field so arrows don't cross
+  const gs = Guesses.find({}, {sort: {[field]: 1}}).fetch();
+
   // Draw guesses on number line, if a field was provided
   {
-    // Grab guesses, sorting by field so arrows don't cross
-    const gs = Guesses.find({}, {sort: {[field]: 1}}).fetch();
-
     // Ordinal point scale
     // https://github.com/d3/d3-scale/blob/master/README.md#scalePoint
     const ord = d3.scaleOrdinal()
@@ -200,10 +200,12 @@ Template.numberLine.onRendered(function() {
   const game = Games.findOne();
 
   // Draw mean value in collaborative treatment
-  if ( CoinFlip.isCollInc() && completedPhase() ) {
+  if ( CoinFlip.isCollInc() && field != null ) {
+    const fieldMean = d3.mean(gs, g => g[field]);
+
     lineGroup.append('circle')
       .attr('class', 'mean')
-      .attr('cx', x(game.mean))
+      .attr('cx', x(fieldMean))
       .attr('cy', 0)
       .attr('r', 8);
 
@@ -211,9 +213,9 @@ Template.numberLine.onRendered(function() {
       .attr('class', 'mean')
       .attr('text-anchor', 'middle')
       .attr('font-size', 20)
-      .attr('x', x(game.mean))
+      .attr('x', x(fieldMean))
       .attr('y', -15)
-      .text(f1(game.mean * 100))
+      .text(f1(fieldMean * 100))
   }
 
   if ( completedPhase() ) {
@@ -266,14 +268,11 @@ Template.coinTable.helpers({
     const user = Meteor.users.findOne(this.userId);
     return user && user.username;
   },
-  oppoGuessed: function() {
-    const oppoGuess = Guesses.findOne({userId: this.userId});
-    if ( delphiGame() ) {
-      return oppoGuess && (oppoGuess.delphi != null);
-    } else {
-      return oppoGuess && (oppoGuess.answer != null);  
-    }
-    
+  delphiGuessed: function() {
+    return this.delphi != null;
+  },
+  answerGuessed: function() {
+    return this.answer != null;
   }
 });
 
