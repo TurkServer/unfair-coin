@@ -7,7 +7,7 @@ var tutorialStepsIntro = [
   {
     template: Template.tut_biased_coin,
     onLoad: function() { Session.set("qBiasedCoin", false); },
-    require: questionBiasedCoinAnswered
+    require: function() { return Session.equals("qBiasedCoin", true);}
   },
   {
     template: Template.tut_goal,
@@ -20,11 +20,11 @@ var tutorialStepsIntro = [
   {
     template: Template.tut_private_flips,
     // Note that this expands the spotlight to show both elements
-    spot: ".own-private-flips, .table-player"
+    onLoad: function() { Session.set("qInfo", false); },
+    spot: ".own-private-flips, .table-player",
+    require: function() { return Session.equals("qInfo", true);}
   }
 ];
-
-Session.setDefault("qBiasedCoin", false);
 
 Template.tut_biased_coin.onCreated(function() {
   this.errorMessage = new ReactiveVar;
@@ -37,22 +37,42 @@ Template.tut_biased_coin.helpers({
 });
 
 Template.tut_biased_coin.events({
-  'submit form#form_question_biased_coin': function(e, t) {
+  'submit form': function(e, t) {
     e.preventDefault();
     if (e.target.optradio.value === "between_30_50") {
       Session.set("qBiasedCoin", true);
       t.errorMessage.set(null);
+    } else {
+      t.errorMessage.set(t.$('input[name=optradio]:checked').attr('data-error'));
     }
-    else {
-      t.errorMessage.set("Sorry, that's not correct. Please try again.");
+  }
+});
+
+Template.tut_private_flips.onCreated(function() {
+  this.errorMessage = new ReactiveVar;
+});
+
+Template.tut_private_flips.helpers({
+  errorMessage: function() {
+    return Template.instance().errorMessage.get();
+  }
+});
+
+Template.tut_private_flips.events({
+  'submit form': function(e, t) {
+    e.preventDefault();
+    if (e.target.optradio.value === "private_info_same") {
+      Session.set("qInfo", true);
+      t.errorMessage.set(null);
+    } else {
+      t.errorMessage.set(t.$('input[name=optradio]:checked').attr('data-error'));
     }
   }
 });
 
 
-function questionBiasedCoinAnswered() {
-  return Session.equals("qBiasedCoin", true);
-}
+
+
 
 function delphiSubmitted() {
   const g = myGuess();
@@ -110,9 +130,38 @@ var tutorialStepsEnd = [
   {
     template: Template.tut_payment,
     spot: ".flip-guesser",
-    onLoad: ensureBotsAnswer 
+    onLoad: function() { 
+      ensureBotsAnswer();
+      Session.set("qBonus", false); 
+    },
+    require: function() { return Session.equals("qBonus", true);}
   }
 ];
+
+
+Template.tut_payment.onCreated(function() {
+  this.errorMessage = new ReactiveVar;
+});
+
+Template.tut_payment.helpers({
+  errorMessage: function() {
+    return Template.instance().errorMessage.get();
+  }
+});
+
+Template.tut_payment.events({
+  'submit form': function(e, t) {
+    e.preventDefault();
+    if (e.target.optradio.value === "true") {
+      Session.set("qBonus", true);
+      t.errorMessage.set(null);
+    } else {
+      t.errorMessage.set(t.$('input[name=optradio]:checked').attr('data-error'));
+    }
+  }
+});
+
+
 
 function getNoCommSteps() {
   var steps = tutorialStepsIntro.concat(tutorialStepsGameNoComm);

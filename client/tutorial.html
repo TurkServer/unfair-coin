@@ -21,28 +21,32 @@
 
         <div class="radio">
           <label>
-          <input type="radio" name="optradio" value="def_40" required>
+          <input type="radio" name="optradio" value="def_40" required 
+            data-error="Sorry, that's not correct.  Having a 40% chance of coming up heads is no guarantee that you will see 40 heads out of 100 flips.">
           I will definitely see exactly 40 heads.
           </label>
         </div>
         <div class="radio">
           <label>
-          <input type="radio" name="optradio" value="no_less_10" required>
+          <input type="radio" name="optradio" value="no_less_10" required 
+            data-error="Sorry, that's not correct.  It is possible to get any number (between 0 and 100) of heads.">
           It is impossible to get fewer than 10 heads.</label>
         </div>
         <div class="radio">
           <label>
-          <input type="radio" name="optradio" value="between_30_50" required>
+          <input type="radio" name="optradio" value="between_30_50">
           It is possible to see any number of heads, but the chances are good that I will get between 30 and 50 heads.</label>
         </div>
         <div class="radio">
           <label>
-          <input type="radio" name="optradio" value="tail_50" required>
+          <input type="radio" name="optradio" value="tail_50" required 
+            data-error="Sorry, that's not correct.  With a 40% chance of coming up heads, there is a 60% chance that the coin will come up tails.">
           There is a 50% chance that the coin will come up tails.</label>
         </div>
         <div class="radio">
           <label>
-          <input type="radio" name="optradio" value="equal_80_15" required>
+          <input type="radio" name="optradio" value="equal_80_15" required 
+            data-error="Sorry, that's not correct.  The chance of getting 80 heads is less than the chance of getting 15 heads.">
           The chances of getting 80 heads is exactly the same as the chance of getting 15 heads.</label>
         </div>
 
@@ -56,7 +60,7 @@
 
     <p>
     {{#if stepCompleted}}
-        <b class="text-success">Continue to the next step.</b>
+        <b class="text-success">You chose the correct answer! Continue to the next step.</b>
     {{else}}
         <b class="text-danger">
             Please answer the question correctly to continue.
@@ -103,21 +107,42 @@
       </b>
     </p>
 
-    <p>
-        Which statement is not true?
+    <form id="form_question_info">
+        Which statement is <b class="text-danger">not true</b>?
 
         <div class="radio">
-          <label><input type="radio" name="optradio">5 coin flips will be observed by every player in my game.</label>
+          <label><input type="radio" name="optradio" value="public_info" data-error="1">
+          5 coin flips will be observed by every player in my game.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">The coin flips that are observed only by me are not seen by any other player.</label>
+          <label><input type="radio" name="optradio" value="meaning_private_info" data-error="2">
+          The coin flips that are observed only by me are not seen by any other player.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">The coin flips that are only observed by me are the same as the coin flips that are only observed by another player.</label>
+          <label><input type="radio" name="optradio" value="private_info_same">
+          The coin flips that are only observed by me are the same as the coin flips that are only observed by another player.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">With 5 players in my game, we have flipped the coin a total of 30 times (30 = 5 + 5 * 5). </label>
+          <label><input type="radio" name="optradio" value="total_flips" data-error="3">
+          With 5 players in my game, we have flipped the coin a total of 30 times (30 = 5 + 5 * 5). </label>
         </div>
+
+        <button type="submit" class="btn btn-info pull-right">
+            Check my Answer</button>
+    </form>
+
+    {{#with errorMessage}}
+        <p><b class="text-warning">{{this}}</b></p>
+    {{/with}}
+
+    <p>
+    {{#if stepCompleted}}
+        <b class="text-success">You chose the correct answer! Continue to the next step.</b>
+    {{else}}
+        <b class="text-danger">
+            Please answer the question correctly to continue.
+        </b>
+    {{/if}}
     </p>
 </template>
 
@@ -148,12 +173,6 @@
         We will show you all players' guesses, the actual number of heads in the 100 new coin flips and your bonus payment.
     </p>    
 </template>
-
-
-
-
-
-
 
 
 <template name="instDelphi_make_initial_guess">
@@ -224,6 +243,20 @@
     {{# if isColl}}
         {{> instColl}}
     {{/if }}
+
+    {{#with errorMessage}}
+        <p><b class="text-warning">{{this}}</b></p>
+    {{/with}}
+
+    <p>
+    {{#if stepCompleted}}
+        <b class="text-success">You chose the correct answer! Continue to the next step.</b>
+    {{else}}
+        <b class="text-danger">
+            Please answer the question correctly to continue.
+        </b>
+    {{/if}}
+    </p>
 </template>
 
 <template name="instIndiv">
@@ -233,22 +266,30 @@
     <p>
         We will calculate the absolute difference between your guess and the actual number of heads in the 100 coin flips, and your bonus payment is based on this difference.  If the difference is larger than ___, you will receive no bonus payment.
     </p>
-    <p>
+
+    <form>
         Which statement is true?
 
         <div class="radio">
-          <label><input type="radio" name="optradio">Other players' guesses do not affect my bonus payment.</label>
+          <label><input type="radio" name="optradio" value="true" >
+          Other players' guesses do not affect my bonus payment.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">My bonus payment will always be greater than zero.</label>
+          <label><input type="radio" name="optradio" value="always_positive">
+          My bonus payment will always be greater than zero.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">My bonus payment does not depend on the accuracy of my guess.</label>
+          <label><input type="radio" name="optradio" value="bonus_accuracy_my_guess">
+          My bonus payment does not depend on the accuracy of my guess.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">If my guess is exactly equal to the actual number of heads in the 100 new coin flips, my bonus payment will be $1.30.</label>
+          <label><input type="radio" name="optradio" value="best_bonus">
+          If my guess is exactly equal to the actual number of heads in the 100 new coin flips, my bonus payment will be $1.30.</label>
         </div>
-    </p>
+
+        <button type="submit" class="btn btn-info pull-right">
+            Check my Answer</button>
+    </form>
 
 </template>
 
@@ -259,22 +300,31 @@
     <p>
         We will calculate the absolute difference between the average guess and the number of heads of the 100 coin flips, and your bonus payment is based on this difference.  If the difference is larger than ___, no one will receive any bonus payment.
     </p>
-    <p>
-        Which statement is true?
+
+    <form>
+        Which statement is not true?
 
         <div class="radio">
-          <label><input type="radio" name="optradio">Other players' guesses do not affect my bonus payment.</label>
+          <label><input type="radio" name="optradio" value="other_no_effect">
+          Other players' guesses do not affect my bonus payment.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">My bonus payment will be different from other players' bonus payments.</label>
+          <label><input type="radio" name="optradio" value="true">
+          My bonus payment will be different from other players' bonus payments.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">My bonus payment depends on the accuracy of the average of all players' guesses.</label>
+          <label><input type="radio" name="optradio" value="bonus_other_guesses">
+          My bonus payment depends on the accuracy of the average of all players' guesses.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">If the average guess is exactly equal to the actual number of heads in the 100 new coin flips, my bonus payment will be $1.30.</label>
+          <label><input type="radio" name="optradio" value="best_bonus">
+          If the average guess is exactly equal to the actual number of heads in the 100 new coin flips, my bonus payment will be $1.30.</label>
         </div>
-    </p>
+
+        <button type="submit" class="btn btn-info pull-right">
+            Check my Answer</button>
+    </form>
+
 </template>
 
 <template name="instComp">
@@ -284,21 +334,30 @@
     <p>
         The player who submitted the closest guess will receive the $1.50 bonus.  In the event of a tie, all players who submitted the closest guesses will split the bonus payment.  All other players will receive no bonus payment.
     </p>
-    <p>
+
+    <form>
         Which statement is true?
 
         <div class="radio">
-          <label><input type="radio" name="optradio">Other players' guesses do not affect my bonus payment.</label>
+          <label><input type="radio" name="optradio" value="other_no_effect">
+          Other players' guesses do not affect my bonus payment.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">When my guess is one of the closest guesses, my bonus payment will be greater than zero.</label>
+          <label><input type="radio" name="optradio" value="true">
+          When my guess is one of the closest guesses, my bonus payment will be greater than zero.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">My bonus payment does not depend on the accuracy of my guess.</label>
+          <label><input type="radio" name="optradio" value="bonus_accuracy_my_guess">
+          My bonus payment does not depend on the accuracy of my guess.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio">If my guess is exactly equal to the actual number of heads in the 100 new coin flips, my bonus payment will be $0.50.</label>
+          <label><input type="radio" name="optradio" value="bonus_value">
+          If my guess is exactly equal to the actual number of heads in the 100 new coin flips, my bonus payment will be $0.50.</label>
         </div>
-    </p>
+
+        <button type="submit" class="btn btn-info pull-right">
+            Check my Answer</button>
+    </form>
+
 </template>
 
