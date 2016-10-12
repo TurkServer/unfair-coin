@@ -6,6 +6,7 @@ var tutorialStepsIntro = [
   },
   {
     template: Template.tut_biased_coin,
+    onLoad: function() { Session.set("qBiasedCoin", false); },
     require: questionBiasedCoinAnswered
   },
   {
@@ -25,11 +26,25 @@ var tutorialStepsIntro = [
 
 Session.setDefault("qBiasedCoin", false);
 
+Template.tut_biased_coin.onCreated(function() {
+  this.errorMessage = new ReactiveVar;
+});
+
+Template.tut_biased_coin.helpers({
+  errorMessage: function() {
+    return Template.instance().errorMessage.get();
+  }
+});
+
 Template.tut_biased_coin.events({
-  'submit form#form_question_biased_coin': function(e) {
+  'submit form#form_question_biased_coin': function(e, t) {
     e.preventDefault();
     if (e.target.optradio.value === "between_30_50") {
       Session.set("qBiasedCoin", true);
+      t.errorMessage.set(null);
+    }
+    else {
+      t.errorMessage.set("Sorry, that's not correct. Please try again.");
     }
   }
 });
