@@ -2,8 +2,7 @@ import { myGuess } from '/client/imports/common.js'
 
 var tutorialStepsIntro = [
   {
-    template: Template.tut_player,
-    spot: ".game_title"
+    template: Template.tut_player
   },
   {
     template: Template.tut_biased_coin
@@ -11,10 +10,6 @@ var tutorialStepsIntro = [
   {
     template: Template.tut_goal,
     spot: ".game_goal"
-  },
-  {
-    template: Template.tut_info,
-    spot: ".coin-flips"
   },
   {
     template: Template.tut_public_flips,
@@ -53,30 +48,19 @@ function ensureBotsAnswer() {
   }
 }
 
+
+
 var tutorialStepsGameNoComm = [
   {
     template: Template.instNoComm_make_guess,
-    spot: ".flip-guesser"
-  },
-  {
-    template: Template.instNoComm_confirm_guess,
     spot: ".flip-guesser",
     require: answerSubmitted
-  },
-  {
-    template: Template.instNoComm_game_end,
-    spot: ".flip-guesser",
-    onLoad: ensureBotsAnswer
   }
 ];
 
 var tutorialStepsGameDelphi = [
   {
     template: Template.instDelphi_make_initial_guess,
-    spot: ".flip-guesser"
-  },
-  {
-    template: Template.instDelphi_confirm_initial_guess,
     spot: ".flip-guesser",
     require: delphiSubmitted
   },
@@ -87,40 +71,28 @@ var tutorialStepsGameDelphi = [
   },
   {
     template: Template.instDelphi_revise_guess,
-    spot: ".flip-guesser"
-  },
-  {
-    template: Template.instDelphi_confirm_final_guess,
     spot: ".flip-guesser",
     require: answerSubmitted
-  },
-  {
-    template: Template.instDelphi_wait_other_final_guesses,
-    spot: ".flip-guesser"
-  },
-  {
-    template: Template.instDelphi_game_end,
-    spot: ".flip-guesser",
-    onLoad: ensureBotsAnswer
   }
 ];
 
-var tutorialStepsBonus = [
+var tutorialStepsEnd = [
   {
     template: Template.tut_payment,
-    spot: ".bonus_info"
+    spot: ".flip-guesser",
+    onLoad: ensureBotsAnswer 
   }
 ];
 
 function getNoCommSteps() {
   var steps = tutorialStepsIntro.concat(tutorialStepsGameNoComm);
-  steps = steps.concat(tutorialStepsBonus);
+  steps = steps.concat(tutorialStepsEnd);
   return steps;
 }
 
 function getDelphiSteps() {
   var steps = tutorialStepsIntro.concat(tutorialStepsGameDelphi);
-  steps = steps.concat(tutorialStepsBonus);
+  steps = steps.concat(tutorialStepsEnd);
   return steps;
 }
 

@@ -1,7 +1,9 @@
 <template name="tut_player">
     <p>
-        In this HIT, you will play a series of guessing games with several
-        other players.
+        You will play 20 guessing games.  
+    </p>
+    <p>
+        For every game, we will match you with 4 other randomly chosen players and you will play the game together.  
     </p>
 </template>
 
@@ -14,11 +16,32 @@
         For example, if the coin has a 30% chance of coming up heads, then roughly, you expect to see 30 heads in 100 new flips of the coin.
     </p>
 
+    <p> 
+        Suppose that a coin has 40% chance of coming up heads.  If you flip the coin 100 times, which statement is true?
+
+        <div class="radio">
+          <label><input type="radio" name="optradio">I will definitely see exactly 40 heads.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">It is impossible to get fewer than 10 heads.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">It is possible to see any number of heads, but the chances are good that I will get between 30 and 50 heads.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">There is a 50% chance that the coin will come up tails.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">The chances of getting 80 heads is exactly the same as the chance of getting 15 heads.</label>
+        </div>
+
+    </p>
+
 </template>
 
 <template name="tut_goal">
     <p>
-        Your <b>goal</b> is to <b>guess the number of heads in 100 new flips of the biased coin</b>.  
+        <b class="text-danger">Your goal is to guess the number of heads in 100 new flips of the biased coin</b>.  
 
         {{#if isInd}}
             You will earn a bonus payment based on the accuracy of your guess.
@@ -29,33 +52,45 @@
 
 </template>
 
-<template name="tut_info">
+<template name="tut_public_flips">
     <p>
         To help you make an accurate guess, you will see some coin flips.
     </p>
     <p>
-        Some flips are observed by all players, whereas other flips are only observed by a particular player.
-    </p>
-
-</template>
-
-<template name="tut_public_flips">
-    <p>
         First, we will flip the coin 5 times, and all players will see the outcome of these 5 flips. 
     </p>
     <p class="text-warning">
-        Take a look at the outcome of these flips on the left.
+        <b>Take a look at the outcome of these 5 flips on the left.</b>
     </p>
 </template>
 
 <template name="tut_private_flips">
     <p>
-        Each player will see an additional 5 coin flips.  These private flips are only seen by that player and not by anyone else.
+        Each player will see an additional 5 coin flips.  These flips are only seen by that player and not by anyone else.
     </p>
     <p class="text-warning">
+    <b>
       Take a look at the outcome of your 5 flips on the left.  
 
-      In the table below, you are also reminded that every other player saw 5 flips but you cannot see the outcome of these flips.  
+      Also note that every other player saw 5 flips but you cannot see the outcome of these flips.  
+      </b>
+    </p>
+
+    <p>
+        Which statement is not true?
+
+        <div class="radio">
+          <label><input type="radio" name="optradio">5 coin flips will be observed by every player in my game.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">The coin flips that are observed only by me are not seen by any other player.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">The coin flips that are only observed by me are the same as the coin flips that are only observed by another player.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">With 5 players in my game, we have flipped the coin a total of 30 times (30 = 5 + 5 * 5). </label>
+        </div>
     </p>
 </template>
 
@@ -63,28 +98,20 @@
     <p> 
         When the game starts, you have 1 minute to make a guess.  
     </p>
-    <b class="text-danger">
-        Please make a guess now by clicking anywhere on the number line or moving the red dot.
-    </b>
-</template>
-
-<!-- Alice: you can reuse this template below -->
-<template name="instNoComm_confirm_guess">
     <p>
         Once you are happy with your guess, you can confirm it by clicking on the "Confirm" button.  
     </p>
     <p>
-        After confirming your guess, you won't be able to change it anymore.  Also you may have to wait for other players to confirm their guesses.
+        After confirming your guess, you won't be able to change it anymore.  
     </p>
     <p>
     {{#if stepCompleted}}
         <b class="text-success">Continue to the next step.</b>
     {{else}}
-        <b class="text-danger">Please revise your guess if you like and confirm it once you are happy with it.</b>
+        <b class="text-danger">Please make a guess by clicking anywhere on the number line or moving the red dot.  Please confirm your guess once you are happy with it.</b>
     {{/if}}
     </p>
 </template>
-
 
 <template name="instNoComm_game_end">
     <p>
@@ -107,29 +134,14 @@
         At the start of the game, you will have 30 seconds to make an initial guess.  
     </p>
     <p>
-    <b class="text-danger">
-        Please make a guess now by clicking anywhere on the number line or moving the red dot.
-        </b>
-    </p>
-
-</template>
-
-<template name="instDelphi_confirm_initial_guess">
-    <p>
-        Once you are happy with your initial guess, you can submit it by clicking on the "Confirm" button.  
+        Once you are happy with your initial guess, you can submit it by clicking on the "Confirm" button.  You will have another chance to revise it later.
     </p>
     <p>
     {{#if stepCompleted}}
         <b class="text-success">Continue to the next step.</b>
     {{else}}
-        <b class="text-danger">Submit your initial guess once you are happy with it.</b>
+        <b class="text-danger">Please enter and confirm your initial guess once you are happy with it.</b>
     {{/if}}
-    </p>
-</template>
-
-<template name="instDelphi_wait_other_initial_guesses">
-    <p>
-        After submitting your initial guess, you may have to wait for other players to submit their initial guesses.
     </p>
 </template>
 
@@ -138,23 +150,12 @@
         Once all players submitted their initial guesses, we will reveal all guesses to everyone. 
     </p>
     {{!Customize this message for different incentives}}
-
 </template>
+
 
 <template name="instDelphi_revise_guess">
     <p>
-        Once all initial guesses are revealed, all players will have 30 seconds to revise their guesses.  
-    </p>
-    <p>
-    <b class="text-danger">
-        If you like, please revise your guess on the number line at the bottom. 
-    </b>
-    </p>
-</template>
-
-<template name="instDelphi_confirm_final_guess">
-    <p>
-        Once you are happy with your guess, you can confirm it by clicking on the "Confirm" button.  After confirming your guess, you won't be able to change it anymore.
+        Every player will have 30 seconds to revise their guess.  Once you confirm this guess, you won't be able to change it anymore.
     </p>
     <p>
     {{#if stepCompleted}}
@@ -162,12 +163,6 @@
     {{else}}
         <b class="text-danger">Please confirm your guess once you are happy with it.</b>
     {{/if}}
-    </p>
-</template>
-
-<template name="instDelphi_wait_other_final_guesses">
-    <p>
-        After confirming your final guess, you may have to wait for other players to confirm their final guesses.
     </p>
 </template>
 
@@ -182,6 +177,14 @@
 
 
 <template name="tut_payment">
+
+    <p>
+        Once all players have confirmed their guesses, the game ends.  On the number line(s), we will show  your guess (in blue), other guesses (in black), 
+        {{# if isColl}}
+            the average guess (in yellow)
+        {{/if}}
+        and the true answer (in green). 
+    </p>
 
     {{# if isInd}}
         {{> instIndiv}}
@@ -198,19 +201,52 @@
 
 <template name="instIndiv">
     <p>
-        Your bonus payment will depend on the accuracy of your guess.  The more accurate your guess is, the higher your bonus payment.  
+        Your bonus payment will depend on the accuracy of your guess.  The more accurate your guess, the higher your bonus payment.  The largest bonus payment you can get is $1.50.
     </p>
     <p>
-        Specifically, your bonus payment will depend on the absolute difference between your guess and the number of heads in the 100 coin flips.  If the difference is too large, you will receive no bonus payment.
+        We will calculate the absolute difference between your guess and the actual number of heads in the 100 coin flips, and your bonus payment is based on this difference.  If the difference is larger than ___, you will receive no bonus payment.
     </p>
+    <p>
+        Which statement is true?
+
+        <div class="radio">
+          <label><input type="radio" name="optradio">Other players' guesses do not affect my bonus payment.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">My bonus payment will always be greater than zero.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">My bonus payment does not depend on the accuracy of my guess.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">If my guess is exactly equal to the actual number of heads in the 100 new coin flips, my bonus payment will be $1.30.</label>
+        </div>
+    </p>
+
 </template>
 
 <template name="instColl">
     <p>
-        Every player will be paid the same bonus payment.  This bonus payment will depend on the accuracy of the <b>average</b> of all players' guesses.  The more accurate the average guess, the higher everyone's bonus payment.
+        You and every other player will get the same bonus payment.  This bonus payment will depend on the accuracy of the <b>average</b> of all players' guesses.  The more accurate the average guess, the higher everyone's bonus payment.  The largest bonus payment you could get is $1.50.
     </p>
     <p>
-        Specifically, the bonus payment will depend on the absolute difference between the average guess and the number of heads of the 100 coin flips.  If the difference is too large, no one will receive any bonus payment.
+        We will calculate the absolute difference between the average guess and the number of heads of the 100 coin flips, and your bonus payment is based on this difference.  If the difference is larger than ___, no one will receive any bonus payment.
+    </p>
+    <p>
+        Which statement is true?
+
+        <div class="radio">
+          <label><input type="radio" name="optradio">Other players' guesses do not affect my bonus payment.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">My bonus payment will be different from other players' bonus payments.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">My bonus payment depends on the accuracy of the average of all players' guesses.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">If the average guess is exactly equal to the actual number of heads in the 100 new coin flips, my bonus payment will be $1.30.</label>
+        </div>
     </p>
 </template>
 
@@ -219,12 +255,23 @@
         You will <b>compete</b> with the other players for a bonus payment of $1.50.  
     </p>
     <p>
-        The player who submitted the closest guess will receive the bonus payment.  In the event of a tie, all players who submitted the closest guesses will split the bonus payment.  All other players will receive no bonus payment.
+        The player who submitted the closest guess will receive the $1.50 bonus.  In the event of a tie, all players who submitted the closest guesses will split the bonus payment.  All other players will receive no bonus payment.
+    </p>
+    <p>
+        Which statement is true?
+
+        <div class="radio">
+          <label><input type="radio" name="optradio">Other players' guesses do not affect my bonus payment.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">When my guess is one of the closest guesses, my bonus payment will be greater than zero.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">My bonus payment does not depend on the accuracy of my guess.</label>
+        </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio">If my guess is exactly equal to the actual number of heads in the 100 new coin flips, my bonus payment will be $0.50.</label>
+        </div>
     </p>
 </template>
 
-<template name="tut_submit_guess">
-    <p>
-        Submit your guess now to continue.
-    </p>
-</template>
