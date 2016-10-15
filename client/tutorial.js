@@ -39,9 +39,10 @@ Template.tut_biased_coin.helpers({
 Template.tut_biased_coin.events({
   'submit form': function(e, t) {
     e.preventDefault();
-    if (e.target.optradio.value === "between_30_50") {
+    if (e.target.optradio.value === "true") {
       Session.set("qBiasedCoin", true);
       t.errorMessage.set(null);
+      t.$('input[name=optradio]').attr('disabled', 'disabled');
     } else {
       t.errorMessage.set(t.$('input[name=optradio]:checked').attr('data-error'));
     }
@@ -61,9 +62,10 @@ Template.tut_private_flips.helpers({
 Template.tut_private_flips.events({
   'submit form': function(e, t) {
     e.preventDefault();
-    if (e.target.optradio.value === "private_info_same") {
+    if (e.target.optradio.value === "true") {
       Session.set("qInfo", true);
       t.errorMessage.set(null);
+      t.$('input[name=optradio]').attr('disabled', 'disabled');
     } else {
       t.errorMessage.set(t.$('input[name=optradio]:checked').attr('data-error'));
     }
@@ -129,7 +131,7 @@ var tutorialStepsGameDelphi = [
 var tutorialStepsEnd = [
   {
     template: Template.tut_payment,
-    spot: ".flip-guesser",
+    spot: ".flip-guesser, .game-results",
     onLoad: function() { 
       ensureBotsAnswer();
       Session.set("qBonus", false); 
@@ -149,12 +151,27 @@ Template.tut_payment.helpers({
   }
 });
 
+Template.registerHelper("quizCoinWrong", function() {
+  return Session.equals("qBiasedCoin", false);
+});
+
+Template.registerHelper("quizInfoWrong", function() {
+  return Session.equals("qInfo", false);
+});
+
+Template.registerHelper("quizBonusWrong", function() {
+  return Session.equals("qBonus", false);
+});
+
+
+
 Template.tut_payment.events({
   'submit form': function(e, t) {
     e.preventDefault();
     if (e.target.optradio.value === "true") {
       Session.set("qBonus", true);
       t.errorMessage.set(null);
+      t.$('input[name=optradio]').attr('disabled', 'disabled');
     } else {
       t.errorMessage.set(t.$('input[name=optradio]:checked').attr('data-error'));
     }
