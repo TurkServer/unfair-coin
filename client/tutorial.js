@@ -107,6 +107,10 @@ var tutorialStepsGameNoComm = [
     template: Template.instNoComm_make_guess,
     spot: ".flip-guesser",
     require: answerSubmitted
+  },
+  {
+    template: Template.instNoComm_answers,
+    spot: ".flip-guesser"
   }
 ];
 
@@ -125,6 +129,10 @@ var tutorialStepsGameDelphi = [
     template: Template.instDelphi_revise_guess,
     spot: ".flip-guesser",
     require: answerSubmitted
+  },
+  {
+    template: Template.instDelphi_answers,
+    spot: ".flip-guesser"
   }
 ];
 

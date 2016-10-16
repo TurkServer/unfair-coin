@@ -107,26 +107,27 @@
     </p>
 
     <form id="form_question_info">
-        Which statement is <b>not true</b>?
+        Which statement is <b>true</b>?
 
         <div class="radio">
-          <label><input type="radio" name="optradio" value="public_info" 
-          data-error="Sorry, the statement you chose is true. Only 5 coin flips will be observed by all players in the game.">
-          Out of all coin flips for each game, only 5 of them will be observed by all players.</label>
+          <label><input type="radio" name="optradio" value="private_flips_same_as_others"
+          data-error="Sorry, this statement is false.  The coin flips that are observed only by me are likely to be different from the coin flips that are only observed by another player.">
+          The 5 coin flips that are only observed by me are the same as the 5 coin flips that are only observed by another player.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio" value="meaning_private_info" 
-          data-error="Sorry, the statement you chose is true.  The coin flips that are observed only by me are not seen by any other player.">
-          The coin flips that are observed only by me are not seen by any other player.</label>
+          <label><input type="radio" name="optradio" value="total_flips_per_player" 
+          data-error="Sorry, this statement is false.  Each player observes a total of 10 coin flips.  5 of the 10 flips will be observed by all players, and the other 5 flips will be observed only by this particular player.">
+          Every player observes a total of 15 coin flips.</label>
         </div>
         <div class="radio">
           <label><input type="radio" name="optradio" value="true">
-          The coin flips that are only observed by me are the same as the coin flips that are only observed by another player.</label>
+          Out of all the coin flips for each game, 5 of them are only observed by me and not by any other player</label>
         </div>
+
         <div class="radio">
-          <label><input type="radio" name="optradio" value="total_flips" 
-          data-error="Sorry, the statement you chose is true.  5 of the 10 flips will be observed by all players, and the other 5 flips will be observed only by this particular player.">
-          Every player observes a total of 10 coin flips.</label>
+          <label><input type="radio" name="optradio" value="total_flips_per_game" 
+          data-error="Sorry, this statement is false. We will flip the coin a total of 30 times. 5 of the 30 flips will be observed by all the players.  Then we will flip the coin 5 times for every player.">
+          For each game, we will flip the coin for a total of 40 times. </label>
         </div>
 
         {{#if quizInfoWrong}}
@@ -164,7 +165,7 @@
     {{#if stepCompleted}}
         <b class="text-success">Continue to the next step.</b>
     {{else}}
-        <b class="text-danger">Please make a guess by clicking anywhere on the number line or moving the red dot.  Please confirm your guess once you are happy with it.</b>
+        <b class="text-danger">Please make a guess and confirm your guess once you are happy with it.</b>
     {{/if}}
     </p>
 </template>
@@ -177,6 +178,11 @@
         We will show you all players' guesses, the actual number of heads in the 100 new coin flips and your bonus payment.
     </p>    
 </template>
+
+
+
+
+
 
 
 <template name="instDelphi_make_initial_guess">
@@ -225,16 +231,32 @@
     </p>    
 </template>
 
-
-<template name="tut_payment">
+<template name="instNoComm_answers">
 
     <p>
-        Once all players have confirmed their guesses, the game ends.  On the number line(s), we will show  your guess (in blue), other guesses (in black), 
+        Once all players have confirmed their guesses, the game ends.  On the number line, we will show  your guess (in blue), other guesses (in black), 
         {{# if isColl}}
             the average guess (in yellow)
         {{/if}}
         and the true answer (in green). 
     </p>
+
+</template>
+
+<template name="instDelphi_answers">
+
+    <p>
+        Once all players have confirmed their guesses, the game ends.  On the number lines, we will show your guess (in blue), other guesses (in black), 
+        {{# if isColl}}
+            the average guess (in yellow)
+        {{/if}}
+        and the true answer (in green). 
+    </p>
+
+</template>
+
+
+<template name="tut_payment">
 
     {{# if isInd}}
         {{> instIndiv}}
@@ -265,34 +287,35 @@
 
 <template name="instIndiv">
     <p>
-        Your bonus payment will depend on the accuracy of your guess.  The more accurate your guess, the higher your bonus payment.  The largest bonus payment you can get is $1.50.
+        <b>Your bonus payment (up to $1.50) will depend on the accuracy of your guess only</b>. 
     </p>
     <p>
-        We will calculate the absolute difference between your guess and the actual number of heads in the 100 coin flips, and your bonus payment is based on this difference.  If the difference is larger than ___, you will receive no bonus payment.
+        Your bonus payment will be based on the absolute difference between your guess and the actual number of heads in the 100 coin flips.  If the difference is larger than ___, you will receive no bonus payment.
     </p>
 
     <form>
         Which statement is true?
 
         <div class="radio">
-          <label><input type="radio" name="optradio" value="true">
-          Other players' guesses do not affect my bonus payment.</label>
-        </div>
-        <div class="radio">
           <label><input type="radio" name="optradio" value="always_positive" 
           data-error="Sorry, that's not correct.  If the difference between your guess and the true answer is too large, your bonus payment will be zero.">
-          My bonus payment will always be greater than zero.</label>
+          My bonus payment will always be positive.</label>
         </div>
         <div class="radio">
           <label><input type="radio" name="optradio" value="bonus_accuracy_my_guess" 
-          data-error="Sorry, that's not correct.  Your bonus payment does depend on the accuracy of your guess.">
-          My bonus payment does not depend on the accuracy of my guess.</label>
+          data-error="Sorry, that's not correct.  Your bonus payment will depend on the accuracy of your guess.">
+          My bonus payment will not depend on the accuracy of my guess.</label>
         </div>
         <div class="radio">
           <label><input type="radio" name="optradio" value="best_bonus" 
           data-error="Sorry, that's not correct.  If your guess is equal to the true answer, your bonus payment will be $1.50.">
-          If my guess is exactly equal to the actual number of heads in the 100 new coin flips, my bonus payment will be $1.30.</label>
+          If my guess is equal to the actual number of heads in the 100 new coin flips, my bonus payment will be $1.30.</label>
         </div>
+        <div class="radio">
+          <label><input type="radio" name="optradio" value="true">
+          Other players' guesses will not affect my bonus payment.</label>
+        </div>
+
 
         {{#if quizBonusWrong}}
 
@@ -306,33 +329,33 @@
 
 <template name="instColl">
     <p>
-        You and every other player will get the same bonus payment.  This bonus payment will depend on the accuracy of the <b>average</b> of all players' guesses.  The more accurate the average guess, the higher everyone's bonus payment.  The largest bonus payment you could get is $1.50.
+        <b>Every player will get the same bonus payment, which will depend on the accuracy of the average of all players' guesses</b>.  
     </p>
     <p>
-        We will calculate the absolute difference between the average guess and the number of heads of the 100 coin flips, and your bonus payment is based on this difference.  If the difference is larger than ___, no one will receive any bonus payment.
+        Each player's bonus payment will be based on the absolute difference between the average guess and the number of heads of the 100 coin flips.  If the difference is larger than ___, no one will receive any bonus payment.
     </p>
 
     <form>
-        Which statement is not true?
+        Which statement is true?
 
         <div class="radio">
-          <label><input type="radio" name="optradio" value="other_no_effect"
-          data-error="Sorry, that's not correct.  Other players' guesses affect the average guess, which affects your bonus payment.">
-          Other players' guesses do not affect my bonus payment.</label>
-        </div>
-        <div class="radio">
           <label><input type="radio" name="optradio" value="bonus_same"
-          data-error="Sorry, that's not correct.  Your bonus payment will be the same as any other player's bonus payment.">
+          data-error="Sorry, this statement is false.  Your bonus payment will be the same as any other player's bonus payment.">
           My bonus payment will be different from other players' bonus payments.</label>
         </div>
         <div class="radio">
+          <label><input type="radio" name="optradio" value="bonus_positive"
+          data-error="Sorry, this statement is false.  If the difference between the average guess and the true answer is too large, your and every other player's bonus payment will be zero.">
+          My bonus payment will always be positive.</label>
+        </div>
+        <div class="radio">
           <label><input type="radio" name="optradio" value="true">
-          My bonus payment depends on the accuracy of the average of all players' guesses.</label>
+          My bonus payment depend on the accuracy of the average of all guesses.</label>
         </div>
         <div class="radio">
           <label><input type="radio" name="optradio" value="best_bonus"
-          data-error="Sorry, that's not correct.  If the average guess is equal to the true answer, every player's bonus payment will be $1.50.">
-          If the average guess is exactly equal to the actual number of heads in the 100 new coin flips, my bonus payment will be $1.30.</label>
+          data-error="Sorry, this statement is false.  If the average guess is equal to the true answer, every player's bonus payment will be $1.50.">
+          If the average guess is equal to the actual number of heads in the 100 new coin flips, my bonus payment will be $1.30.</label>
         </div>
 
         {{#if quizBonusWrong}}
@@ -347,7 +370,7 @@
 
 <template name="instComp">
     <p>
-        You will <b>compete</b> with the other players for a bonus payment of $1.50.  
+        <b>You will compete with the other players for a bonus payment up to $1.50</b>.  
     </p>
     <p>
         The player who submitted the closest guess will receive the $1.50 bonus.  In the event of a tie, all players who submitted the closest guesses will split the bonus payment.  All other players will receive no bonus payment.
@@ -363,15 +386,15 @@
         </div>
         <div class="radio">
           <label><input type="radio" name="optradio" value="true">
-          When my guess is one of the closest guesses, my bonus payment will be greater than zero.</label>
+          When my guess is one of the closest guesses, my bonus payment will be positive.</label>
         </div>
         <div class="radio">
           <label><input type="radio" name="optradio" value="bonus_accuracy_my_guess"
           data-error="Sorry, that's not correct.  Whether you get the bonus payment or not depends on whether your guess was one of the closest guesses.">
-          My bonus payment does not depend on the accuracy of my guess.</label>
+          My bonus payment will not depend on the accuracy of my guess.</label>
         </div>
         <div class="radio">
-          <label><input type="radio" name="optradio" value="bonus_value"
+          <label><input type="radio" name="optradio" value="best_bonus"
           data-error="Sorry, that's not correct.  Even if your guess is equal to the true answer, the amount of your bonus payment depends on whether other players also made the same guess.">
           If my guess is exactly equal to the actual number of heads in the 100 new coin flips, my bonus payment will be $0.50.</label>
         </div>
