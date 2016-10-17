@@ -1,12 +1,10 @@
 // https://forums.meteor.com/t/immutable-bindings-of-es6-modules/25118/5
 // Otherwise d3.event is not usable.
 const d3 = require('d3');
-import { 
-  delphiGame,
+import {
   gamePhase, 
   guessSubmitted,
   completedPhase,
-  myGuess
 } from '/client/imports/common.js';
 
 Template.displayFlips.helpers({
@@ -238,8 +236,9 @@ Template.numberLine.onRendered(function() {
 });
 
 Template.numberLine.events({
-  // TODO debounce this to avoid double events on server
-  'click .confirm-guess': function(e, t) {
+  // Debounced to avoid double events on server
+  // In any case, the server should reject such events.
+  'click .confirm-guess': _.debounce(function(e, t) {
     e.preventDefault();
     const guess = t.guessValue.get() / 100;
 
@@ -253,7 +252,7 @@ Template.numberLine.events({
 
     // Cancel drag updates
     t.drag.on("start", null).on("drag", null);
-  }
+  }, 1000, true)
 });
 
 Template.coinTable.helpers({
