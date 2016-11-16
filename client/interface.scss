@@ -45,3 +45,16 @@ svg {
     display: inline-block;
   }
 }
+
+.coin {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  background-image: url("/img/coin.png");
+  background-size: 100px 50px;
+  background-repeat: no-repeat;
+}
+
+.coin.tail {
+  background-position: 100% 0%;
+}

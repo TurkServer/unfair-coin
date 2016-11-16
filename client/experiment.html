@@ -30,14 +30,14 @@
 <template name="temPublicFlips">
     <div class="public-flips">
         <h3><b>What everyone saw:</b></h3>
-        <h3 class="text-center">{{> displayFlips publicFlips}}</h3>
+        {{> displayFlips publicFlips}}
     </div>
 </template>
 
 <template name="temPrivateFlips">
     <div class="own-private-flips">  
         <h3><b>What only you saw:</b></h3>
-        <h3 class="text-center">{{> displayFlips privateFlips}}</h3>
+        {{> displayFlips privateFlips}}
     </div>
 </template>
 
@@ -86,17 +86,20 @@
     </table>
 </template>
 
-
 <template name="displayFlips">
-<!--     {{#each this}}
+    <div class="text-center">
+    {{#each this}}
         {{#if this}}
-        <img src='/img/coin-head.png' height="20">
+            <div class="coin head"></div>
         {{else}}
-        <img src='/img/coin-tail.jpg' height="20">
+            <div class="coin tail"></div>
         {{/if}}
     {{/each}}
- -->    
+    </div>
+
+    <h3 class="text-center">
     {{heads}} heads / {{total}} flips
+    </h3>
 </template>
 
 <template name="controller">
