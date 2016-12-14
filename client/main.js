@@ -38,6 +38,15 @@ Template.home.events({
   // }
 });
 
+
+Template.experiment.onCreated(function() { 
+     var bell = new buzz.sound('/sound/bell', {formats: ['ogg', 'mp3'], 
+     volume: 40}); 
+     bell.play(); 
+     console.log('sounds!');
+}); 
+
+
 Meteor.methods({
   flip: function(){
     //Animate: flip a coin and show H / T
