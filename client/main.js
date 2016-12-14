@@ -30,15 +30,7 @@ Template.testForm.events({
        TurkServer.submitExitSurvey(results);
    }
  });
-
-Template.home.events({
-  // 'click button': function (e) {
-  //   // Start the game from client
-  //   Meteor.call('Start');
-  // }
-});
-
-
+ 
 Template.experiment.onCreated(function() { 
      var bell = new buzz.sound('/sound/bell', {formats: ['ogg', 'mp3'], 
      volume: 40}); 
@@ -46,6 +38,12 @@ Template.experiment.onCreated(function() {
      console.log('sounds!');
 }); 
 
+Template.home.events({
+  // 'click button': function (e) {
+  //   // Start the game from client
+  //   Meteor.call('Start');
+  // }
+});
 
 Meteor.methods({
   flip: function(){
