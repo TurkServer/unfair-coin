@@ -1,6 +1,9 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check'
 
+import { drawProb } from '/server/imports/math.js';
+import { generateScenario, setupGame } from '/server/imports/scenario.js';
+
 Meteor.publish("GameInfo", function() {
   // These are all partitioned by game.
   return [
@@ -22,153 +25,18 @@ Meteor.publish("AdminInfo", function(_groupId) {
   ];
 });
 
-// Returns a random integer between min (included) and max (excluded)
-// Using Math.round() will give you a non-uniform distribution!
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
-// Draw a random probability from the not-quite-uniform prior:
-// 0.01 through 0.99 inclusive
-function drawProb() {
-  return getRandomInt(1, 100) / 100.0;
-}
-
-// Flip a biased coin. Returns true with probability p.
-function flipCoin(p) {
-  return (Math.random() < p);
-}
-
-function binomialFlips(n, p) {
-  const result = [];
-  for( let i = 0; i < n; i++ ) {
-    result.push(flipCoin(p));
-  }
-  return result;
-}
-
-// Generate data for a new game. Used in tutorial and actual games.
-function generateGame(prob, publicFlips, privateFlipList,
-                      userIds, incentive, delphi) {
-
-  // The reason we might use the gameId here is to reuse scenarios
-  const gameId = Games.insert({
-    createdAt: new Date(),
-    publicData: publicFlips,
-    privateDataList: privateFlipList,
-    prob,
-    incentive,
-    delphi,
-    phase: delphi ? "delphi" : "final"
-  });
-
-  // Assign users to roles in random order
-  _.shuffle(userIds).forEach(function(userId, idx) {
-    Guesses.insert({
-      userId,
-      gameId,
-      order: idx,
-      privateData: privateFlipList[idx], //de-normalized
-      answer: null
-    });
-  });
-
-}
-
 Meteor.methods({
   newGame: function (n_p, n_v, incentive, delphi){
     check(n_p, Number);
     check(n_v, Number);
 
     const p = drawProb();
-
     // Set up game with number of online users
-    const userIds = TurkServer.Instance.currentInstance().users();     
+    const userIds = TurkServer.Instance.currentInstance().users();
 
-    // Generate data from server side.
-    const publicData = binomialFlips(n_p, p);
-    const privateDataList = [];
-    for (let i = 0; i < userIds.length; i++) {
-      privateDataList.push( binomialFlips(n_v, p) );
-    }
+    const scenarioId = generateScenario(n_p, n_v, p, userIds.length);
 
-    // Store game
-    generateGame(p, publicData, privateDataList, userIds, incentive, delphi);
-  },
-
-  // Generate a fake game for tutorial purposes.
-  tutorialGame: function(incentive, delphi) {
-    const p = 0.75;
-
-    // The single user doing the tutorial, plus two fake bots
-    const userIds = [
-      TurkServer.Instance.currentInstance().users()[0],
-      "bot1",
-      "bot2"
-    ];
-
-    const publicFlips = [ true, true, false, false, true ];
-
-    const privateFlips = [
-      [ true, false, true, false, false ],
-      [ false, true, true, true, true ],
-      [ true, true, true, true, true ]
-    ];
-
-    generateGame(p, publicFlips, privateFlips, userIds, incentive, delphi);
-
-  },
-  // Submit fake guesses for the bots
-  tutBotsDelphi: function () {
-    const userId = Meteor.userId();
-    check(userId, String);
-    
-    const game = Games.findOne();
-    if( game.phase !== "delphi" ) return;
-    
-    Guesses.find({
-      userId: {$ne: userId}, 
-      delphi: null
-    }).forEach(function(g) {
-      const total = _.countBy(game.publicData).true 
-        + _.countBy(g.privateData).true;
-      
-      Guesses.update(g._id, {
-        $set: {
-          delphi: (total + getRandomInt(0, 11)) / 20.0
-        }
-      });
-    });
-
-    Games.update({}, {$set: {phase: "final"}});
-  },
-  tutBotsAnswer: function () {
-    const userId = Meteor.userId();
-    check(userId, String);
-
-    const game = Games.findOne();
-    if( game.phase !== "final" ) return;
-
-    Guesses.find({
-      userId: {$ne: userId},
-      answer: null
-    }).forEach(function(g) {
-      const total = _.countBy(game.publicData).true
-        + _.countBy(g.privateData).true;
-
-      Guesses.update(g._id, {
-        $set: {
-          answer: (total * 8 + getRandomInt(0, 21)) / 100.0
-        }
-      });
-    });
-
-    // TODO potential race conditions here too, or at least ensure client is debounced
-    Meteor.call("computePayoffs");
-    Games.update({}, {$set: {phase: "completed"}});
-    TurkServer.Instance.currentInstance().teardown(false);
+    setupGame(scenarioId, userIds, incentive, delphi);
   },
 
   updateDelphi: function (guess) {
@@ -295,8 +163,8 @@ Meteor.methods({
   },
 
   goToLobby: function() {
-    var userId = Meteor.userId();
-    var inst = TurkServer.Instance.currentInstance();
+    const userId = Meteor.userId();
+    const inst = TurkServer.Instance.currentInstance();
 
     if( inst == null ) {
       console.log("No instance for " + userId, "; ignoring goToLobby");
