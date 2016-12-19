@@ -168,10 +168,14 @@
 -->
 <template name="numberLine">
     <svg class="center-block" width="{{c 'width'}}" height="{{c 'height'}}">
-        {{! arrowhead - http://vanseodesign.com/web-design/svg-markers/ }}
+        {{!
+        arrowhead - http://vanseodesign.com/web-design/svg-markers/
+        see also https://www.w3.org/TR/SVG2/painting.html#VertexMarkerProperties
+        }}
         <defs>
             <marker id="arrow" markerWidth="10" markerHeight="10" refx="8" refy="3" orient="auto" markerUnits="strokeWidth">
-                <path d="M0,0 L0,6 L9,3 z" fill="#000" />
+                <path d="M0,0 L0,6 L9,3 z" fill="context-fill"
+                      stroke="context-stroke"/>
             </marker>
         </defs>
 

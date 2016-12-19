@@ -9,6 +9,10 @@ svg {
     fill: hsl(0,60%,50%);
   }
 
+  circle {
+    opacity: 0.8;
+  }
+
   .actual {
     stroke: #3c763d;
     fill: #3c763d;
@@ -50,11 +54,13 @@ svg {
   display: inline-block;
   width: 50px;
   height: 50px;
-  background-image: url("/img/coin.png");
-  background-size: 100px 50px;
-  background-repeat: no-repeat;
-}
+  background-size: 50px 50px;
 
-.coin.tail {
-  background-position: 100% 0%;
+  &.head {
+    background-image: url("/img/coin-head.png");
+  }
+
+  &.tail {
+    background-image: url("/img/coin-tail.png");
+  }
 }
