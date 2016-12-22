@@ -2,10 +2,14 @@
 // Otherwise d3.event is not usable.
 const d3 = require('d3');
 import {
-  gamePhase, 
+  gamePhase,
   guessSubmitted,
   completedPhase,
 } from '/client/imports/common.js';
+
+Template.timeInfo.helpers({
+  currentRound: TurkServer.currentRound
+});
 
 Template.displayFlips.helpers({
   heads: function() {
@@ -64,7 +68,7 @@ const f1 = d3.format('.1f');
 Template.numberLine.onRendered(function() {
   const field = this.data && this.data.field;
   const guessValue = this.guessValue;
-  
+
   // Config parameters
   const svg = d3.select(this.find('svg'));
   const height = this.$('svg').height();
@@ -108,7 +112,7 @@ Template.numberLine.onRendered(function() {
     // Update value on any click or drag
     // Note: this has to be cancelled upon submit
     const drag = d3.drag()
-      .on('start', onDrag) 
+      .on('start', onDrag)
       .on('drag', onDrag);
 
     svg.call(drag);

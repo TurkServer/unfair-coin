@@ -9,6 +9,8 @@
 
     {{! Table of users next to number line}}
     <div class="col-md-4 coin-flips">
+        <h3>{{> timeInfo }}</h3>
+
         {{> temPublicFlips }}
 
         {{> temPrivateFlips }}
@@ -25,7 +27,14 @@
     {{/if}}
 </template>
 
-
+<template name="timeInfo">
+    Round {{currentRound.index}}:
+    {{#if currentRound.ended}}
+        {{tsBreakRemainingTime}} until next round
+    {{else}}
+        {{tsRoundRemainingTime}} remaining
+    {{/if}}
+</template>
 
 <template name="temPublicFlips">
     <div class="public-flips">
@@ -35,7 +44,7 @@
 </template>
 
 <template name="temPrivateFlips">
-    <div class="own-private-flips">  
+    <div class="own-private-flips well">
         <h3><b>What only you saw:</b></h3>
         {{> displayFlips privateFlips}}
     </div>
@@ -120,9 +129,9 @@
 
     {{#if finalPhase}}
         {{#if delphiGame}}
-            
+
             <h3>Here are all the initial guesses.</h3>
-            
+
             {{> numberLine field="delphi" }}
 
             {{#if myGuess.answer}}
@@ -244,11 +253,11 @@
           {{! TODO better message for ties }}
             Congratulations! You earned a bonus of <b>{{ myPayoff }}</b>. Your guess was one of the closest to the actual value.
         {{else}}
-          Sorry!  You did not earn anything since your guess was not one of the closest. 
+          Sorry!  You did not earn anything since your guess was not one of the closest.
         {{/if}}
       {{else}}
           {{#if isCollInc}}
-              You and every other player earned a bonus of 
+              You and every other player earned a bonus of
               <b>{{ myPayoff }}</b>.
           {{else}}
               You earned a bonus of <b>{{ myPayoff }}</b>.

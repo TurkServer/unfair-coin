@@ -17,7 +17,7 @@ Meteor.publish("GameInfo", function() {
 Meteor.publish("AdminInfo", function(_groupId) {
   if ( !TurkServer.isAdmin(this.userId) ) return [];
   const users = Experiments.findOne({_id: _groupId}).users;
-  
+
   return [
     Meteor.users.find({_id: {$in: users}}),
     Games.direct.find({_groupId}),
@@ -25,18 +25,18 @@ Meteor.publish("AdminInfo", function(_groupId) {
   ];
 });
 
+// XXX a quick hack to configure rounds while testing
+let n_pub = 5, n_priv = 5;
+
 Meteor.methods({
   newGame: function (n_p, n_v, incentive, delphi){
     check(n_p, Number);
     check(n_v, Number);
 
-    const p = drawProb();
-    // Set up game with number of online users
-    const userIds = TurkServer.Instance.currentInstance().users();
+    n_pub = n_p;
+    n_priv = n_v;
 
-    const scenarioId = generateScenario(n_p, n_v, p, userIds.length);
-
-    setupGame(scenarioId, userIds, incentive, delphi);
+    startGameRound(true);
   },
 
   updateDelphi: function (guess) {
@@ -56,15 +56,14 @@ Meteor.methods({
       });
 
     if (update === 0) throw new Meteor.Error(400, "Already updated");
-    
+
+    // Once everyone's guessed, update game phase for clients to display
     if ( Guesses.find({ delphi: null }).count() === 0 ) {
-      // TODO: compute mean
-      
-      // Update game phase for clients to display
-      Games.update({}, {$set: {phase: "final"}});
+      // This ensures the operation only happens once
+      Games.update({phase: "delphi"}, {$set: {phase: "final"}});
     }
   },
-  
+
   updateAnswer: function (guess) {
     const userId = Meteor.userId();
     check(userId, String);
@@ -74,6 +73,7 @@ Meteor.methods({
       answer: null
     },
     {
+
       $set: {
         createdAt: new Date(),
         answer: guess
@@ -83,15 +83,17 @@ Meteor.methods({
     if (update === 0) throw new Meteor.Error(400, "Already updated");
 
     // If all users in this game have updated, compute payoffs
-    // TODO: fix potential race conditions here; don't run this function twice
     if ( Guesses.find({ answer: null}).count() === 0 ) {
-      console.log("Computing payoffs");
-      Meteor.call("computePayoffs");
 
-      Games.update({}, {$set: {phase: "completed"}});
-      
-      // Set the end time on the instance, but users go back to lobby themselves
-      TurkServer.Instance.currentInstance().teardown(false);
+      if ( Games.update({phase: "final"}, {$set: {phase: "completed"}}) === 0) {
+        // This ensures that the end round code only runs once,
+        // even if the last two users submit their guesses simultaneously
+        return;
+      }
+
+      // End current round manually.
+      // Payoffs will be computed, and any new round started if necessary.
+      TurkServer.Timers.endCurrentRound();
     }
   },
 
@@ -101,9 +103,11 @@ Meteor.methods({
 
     const actualProb = game.prob;
 
+    // Grab guesses that were submitted
     const gs = Guesses.find({answer: {$ne: null}}).fetch();
+
     if (gs.length !== game.privateDataList.length) {
-      throw new Meteor.Error(400, "Wrong number of players");
+      Meteor._debug(`Game ${game._id} had ${game.privateDataList.length} players but only ${gs.length} guesses`)
     }
 
     // Store average guess for this game, both for data purposes and since
@@ -154,7 +158,7 @@ Meteor.methods({
       for( let guess of gs ) {
         addPayoff(game._id, guess.userId, payoff);
       }
-             
+
     }
 
     else {
@@ -175,8 +179,75 @@ Meteor.methods({
   }
 });
 
+function startGameRound(immediate = true) {
+  const delay = immediate ? 0 : Config.round.between;
+
+  // XXX this is a bit of a hack at the moment.
+  // It's also not robust to the server getting restarted
+  Meteor.setTimeout(function() {
+    const p = drawProb();
+    // Set up game with number of online users
+    const userIds = TurkServer.Instance.currentInstance().users();
+
+    const scenarioId = generateScenario(n_pub, n_priv, p, userIds.length);
+
+    setupGame(scenarioId, userIds, incentive, delphi);
+  }, delay);
+
+  const now = Date.now();
+  const start = now + delay;
+  const end = start + Config.round.timelimit;
+  TurkServer.Timers.startNewRound(new Date(start), new Date(end));
+}
+
+function endGameRound(reason) {
+  // reason ==
+  // TurkServer.Timers.ROUND_END_TIMEOUT
+  // TurkServer.Timers.ROUND_END_MANUAL
+  // TurkServer.Timers.ROUND_END_NEWROUND
+  if ( reason === TurkServer.Timers.ROUND_END_NEWROUND ) {
+    throw new Error("newRound shouldn't have been called to end a current round.")
+  }
+
+  // Do cleanup if the round timed out
+  if ( reason === TurkServer.Timers.ROUND_END_TIMEOUT ) {
+    // Set timeout for players who had no guess
+    Guesses.update({ answer: null }, { $set: {timeout: true} }, { multi: true });
+
+    // Patch up actions for players who submitted a delphi guess but no final guess
+    // These guesses will also have the 'timeout' flag on them so we can identify them later
+    Guesses.find({ delphi: {$ne: null}, answer: null}).forEach(function(guess) {
+      Guesses.update(guess._id, {
+        $set: { answer: guess.delphi }
+      });
+    });
+  }
+
+  // Compute payoffs
+  Meteor.call("computePayoffs");
+
+  const currentRound = RoundTimers.findOne({}, {sort: {index: -1}});
+  // Last round - end the game
+  if ( currentRound.index === Config.round.count ) {
+    // Set the end time on the instance, but users go back to lobby themselves
+    TurkServer.Instance.currentInstance().teardown(false);
+    return;
+  }
+
+  // Not the last round - start a new round
+  startGameRound(false);
+}
+
+TurkServer.Timers.onRoundEnd(endGameRound);
+
 function addPayoff(gameId, userId, payoff) {
   Guesses.update({gameId, userId}, {$set: {payoff} });
-  
-  // TODO record payoffs elsewhere, unless game is a tutorial
+
+  // TODO record payoffs elsewhere
+
+  // unless game is a tutorial
+  if (TurkServer.treatment().tutorial) return;
+
+  // or the player's guess timed out
+
 }
